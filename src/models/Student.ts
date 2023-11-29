@@ -84,33 +84,7 @@ export class Student extends Model {
     updatedAt!: Date;
 }
 
-// Student.init(
-//     {
-//         // Define your model attributes here
-//         firstName: DataType.STRING,
-//         lastName: DataType.STRING,
-//         parentsName: DataType.STRING,
-//         status: DataType.STRING,
-//         sessionTransferRate: DataType.NUMBER,
-//         percentageOfAbsences: DataType.STRING,
-//         contactEmail: DataType.STRING,
-//         contactTelephone: DataType.STRING,
-//         allowTelegramNotification: DataType.BOOLEAN,
-//         telegramId: DataType.NUMBER,
-//         issue: DataType.STRING,
-//         dateOfInitialDiagnosis: DataType.STRING,
-//         address: DataType.STRING,
-//         foundUsThrough: DataType.STRING,
-//         online: DataType.BOOLEAN,
-//         notes: DataType.STRING,
-//         createdAt: DataType.DATE,
-//         updatedAt: DataType.DATE
-//     },
-//     {
-//         sequelize, // Pass the sequelize instance to the model
-//         modelName: 'Student', // Set the model name
-//     }
-// );
+
 
 sequelize.addModels([Student]);
 

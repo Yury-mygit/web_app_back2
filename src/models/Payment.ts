@@ -1,19 +1,20 @@
 import { Model, Column, Table, AutoIncrement, PrimaryKey, AllowNull, DataType, ForeignKey } from 'sequelize-typescript';
 import { Student } from './Student';
+import {sequelize} from "../database/database";
 
-enum PaymentStatus {
+export enum PaymentStatus {
     NEW = "new",
     ACTIVE = "active",
     SPENT = "spent"
 }
 
-enum SubscriptionType {
+export enum SubscriptionType {
     ONE_LESSON = 1,
     FOUR_LESSONS = 4,
     EIGHT_LESSONS = 8
 }
 
-@Table
+@Table({ tableName: 'payment' })
 class Payment extends Model {
     @AutoIncrement
     @PrimaryKey
@@ -40,4 +41,6 @@ class Payment extends Model {
 
 }
 
-export {Payment}
+sequelize.addModels([Payment])
+
+export default Payment

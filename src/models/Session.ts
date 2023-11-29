@@ -1,8 +1,9 @@
 import { Model, Column, Table, AutoIncrement, PrimaryKey, AllowNull, DataType, ForeignKey } from 'sequelize-typescript';
-import { Student } from './Student';
-import { Employee } from './Employee';
-import { Office } from './Office';
-import { Payment } from './Payment';
+import  Student  from './Student';
+import  Employee  from './Employee';
+import  Office  from './Office';
+import  Payment  from './Payment';
+import {sequelize} from "../database/database";
 
 enum ServiceType {
     // Define your service types here
@@ -12,7 +13,7 @@ enum Status {
     // Define your statuses here
 }
 
-@Table
+@Table({ tableName: 'session' })
 class Session extends Model {
     @AutoIncrement
     @PrimaryKey
@@ -79,3 +80,7 @@ class Session extends Model {
     @Column
     payment_id!: number;
 }
+
+sequelize.addModels([Session]);
+
+export default Session;

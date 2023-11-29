@@ -1,10 +1,11 @@
 import { Model, Column, Table, AutoIncrement, PrimaryKey, AllowNull, DataType } from 'sequelize-typescript';
+import {sequelize} from "../database/database";
 
 enum Status {
-    // Define your statuses here
+    'active' =0,
 }
 
-@Table
+@Table({ tableName: 'employee' })
 class Employee extends Model {
     @AutoIncrement
     @PrimaryKey
@@ -12,7 +13,7 @@ class Employee extends Model {
     id!: number;
 
     @AllowNull(false)
-    @Column(DataType.ENUM({values: Object.values(Status)}))
+    @Column(DataType.ENUM(...Object.keys(Status)))
     status!: Status;
 
     @AllowNull(false)
@@ -60,4 +61,6 @@ class Employee extends Model {
     experience_years!: number;
 }
 
-export {Employee}
+sequelize.addModels([Employee])
+
+export default Employee
