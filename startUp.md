@@ -24,6 +24,11 @@ npm install express sequelize pg pg-hstore axios
 npm install --save-dev typescript ts-node @types/node @types/express @types/sequelize @types/node-schedule
 ```
 
+```bash
+npm install --save sequelize pg-hstore pg sequelize-typescript
+```
+
+
 Create a tsconfig.json file:
 ```bash
 npx tsc --init
@@ -125,7 +130,7 @@ tsconfig.json
 }
 ```
 
-
+## NODEMON
 nodemon.json
 ```bash
 {
@@ -138,6 +143,26 @@ run
 ```bash
 npm run dev
 ```
+
+
+To use nodemon in inspection mode, follow these steps:
+Install nodemon if you haven't already.  
+You can install it globally with npm install -g nodemon or as a dev dependency in your project with npm install --save-dev nodemon.  
+Run your script with nodemon and the --inspect flag.   
+Replace your-script.js with the path to your main Node.js file.   
+For example:  
+```bash
+nodemon --inspect src/app.ts
+```
+
+```bash
+nodemon --inspect=9230 src/app.ts
+```
+Open Chrome and navigate to chrome://inspect.   
+Click on "Open dedicated DevTools for Node".  
+In the DevTools window, click on "Add connection" and enter localhost:9230 (or whatever port you specified).  
+Your Node.js application should now be listed under "Remote Target". Click on "inspect" to open a debugging session.  
+You can now set breakpoints, step through your code, inspect variables, and see console output in the DevTools window  
 
 ## Swagger
 To use Swagger UI with Express, you'll need to install two npm packages: swagger-ui-express and swagger-jsdoc. Here are the steps:
@@ -289,6 +314,12 @@ npm install winston
 
 ```
 
+## FAKER
+https://www.npmjs.com/package/@faker-js/faker
+
+```bash
+npm install --save-dev @faker-js/faker
+```
 
 This will log all errors to error.log and all logs to combined.log.
 Remember to place the error handling middleware after all your routes, so that any errors that occur while handling requests will be passed to it.
