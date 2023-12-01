@@ -1,8 +1,13 @@
 import express from 'express';
-import StudentModel from '../../models/StudentModel';
+import StudentModel from '../../models/student-model';
+import studentController from "../../controllers/student-controller";
 import {faker} from "@faker-js/faker";
 
 const router = express.Router();
+
+const { getAll } = studentController;
+const boundGetAll = getAll.bind(studentController);
+
 
 /**
  * @openapi
@@ -32,26 +37,7 @@ const router = express.Router();
  *         '200':
  *           description: Successful operation
  */
-router.get('/', async (req, res) => {
-    try {
-        const skip = parseInt(req.query.skip as string) || 0;
-        const limit = parseInt(req.query.limit as string) || 100;
-
-        const students = await StudentModel.findAll({
-            offset: skip,
-            limit: limit,
-            order:['id']
-        });
-
-        res.json(students);
-    } catch (err) {
-        if (err instanceof Error) {
-            res.status(500).json({ error: err.message });
-        } else {
-            res.status(500).json({ error: 'An unknown error occurred' });
-        }
-    }
-});
+router.get('/', boundGetAll);
 
 /**
  * @openapi

@@ -1,5 +1,5 @@
 import express from 'express';
-import { StudentModel } from '../../models/StudentModel';
+import { StudentModel } from '../../models/student-model';
 import { faker } from '@faker-js/faker';
 import {sequelize} from '../../database/database'
 import Employee from "../../models/Employee";

@@ -1,5 +1,5 @@
 import { Model, Column, Table, AutoIncrement, PrimaryKey, AllowNull, DataType, ForeignKey } from 'sequelize-typescript';
-import  StudentModel  from './StudentModel';
+import  StudentModel  from './student-model';
 import  Employee  from './Employee';
 import  Office  from './Office';
 import  Payment  from './Payment';

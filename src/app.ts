@@ -4,7 +4,7 @@ import swaggerUi from 'swagger-ui-express';
 import cors from 'cors';
 import bodyParser from 'body-parser';
 import { sequelize } from './database/database';
-import routes from './routers/routes';
+import routes from './routers';
 import 'dotenv/config'
 
 const cookieParser = require('cookie-parser')
@@ -20,7 +20,7 @@ const swaggerOptions = {
         },
         servers: [
             {
-                url: 'http://localhost:3001',
+                url: 'http://localhost:3002',
             },
         ],
         tags: [
@@ -35,7 +35,7 @@ const swaggerOptions = {
     },
     apis: [
         './src/app.ts',
-        './src/routers/routes.ts',
+        './src/routers/index.ts',
         './src/routers/routers/TestRouter.ts',
         './src/routers/routers/StudentRouter.ts',
         './src/routers/routers/OfficeRouter.ts',
@@ -48,20 +48,14 @@ const swaggerDocs = swaggerJsDoc(swaggerOptions);
 
 app.use(express.json())
 app.use(cookieParser())
-app.use(cors()); // Use cors as a middlewar
+app.use(cors({
+    origin: 'http://localhost:3002'
+})); // Use cors as a middlewar
 app.use(bodyParser.json()); // for parsing application/json
 app.use(bodyParser.urlencoded({ extended: true })); // for parsing application/x-www-form-urlencoded
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocs));
 app.use('/', routes);
 
-// async function syncModels() {
-//     try {
-//     await sequelize.sync();
-//     console.log('Models synced successfully.');
-//   } catch (error) {
-//     console.error('Error syncing models:', error);
-//   }
-// }
 
 const runServer = async () =>{
     try {
