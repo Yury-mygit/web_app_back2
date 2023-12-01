@@ -1,10 +1,10 @@
 import express from 'express';
-import { Student } from '../models/Student';
+import { StudentModel } from '../../models/StudentModel';
 import { faker } from '@faker-js/faker';
-import {sequelize} from '../database/database'
-import Employee from "../models/Employee";
-import Office from "../models/Office";
-import Payment, { PaymentStatus, SubscriptionType} from "../models/Payment";
+import {sequelize} from '../../database/database'
+import Employee from "../../models/Employee";
+import Office from "../../models/Office";
+import Payment, { PaymentStatus, SubscriptionType} from "../../models/Payment";
 import {error} from "winston";
 
 const router = express.Router();
@@ -22,26 +22,22 @@ function getRandomElement<T>(array: T[]): T | undefined {
  * @openapi
  * /test/fill:
  *   post:
+ *     tags:
+ *        - Test routes
  *     description: Fill database with test random data
  *     responses:
  *       200:
  *         description: Returns a success message.
  */
 router.post('/fill', async (req, res) => {
-
-    let s
-
-    dropdata()
-        .then(()=>studentfill(5))
-        .then(()=>employeefill(3))
-        .then(()=>officeFill(2))
-        .then(()=>sessionFill())
-        .then(() => {
-            res.status(200).json({ status: 'ok', desk: 'All good' });
-        })
-        .catch((err) => {
-            res.status(500).json({ status: 'error', desk: err.message || 'An unknown error occurred' });
-        });
+    dropdata().then(()=>Promise.all([studentfill(5), employeefill(3), officeFill(2),]))
+    .then(()=>sessionFill())
+    .then(() => {
+        res.status(200).json({ status: 'ok', desk: 'All good' });
+    })
+    .catch((err) => {
+        res.status(500).json({ status: 'error', desk: err.message || 'An unknown error occurred' });
+    });
 
 });
 
@@ -51,7 +47,7 @@ const studentfill = async ( number: number) => {
             let dateOfInitialDiagnosis = new Date();
             dateOfInitialDiagnosis.setDate(dateOfInitialDiagnosis.getDate() - 7);
 
-            await Student.create({
+            await StudentModel.create({
                 firstName: faker.person.firstName(),
                 lastName: faker.person.lastName(),
                 parentsName: faker.person.firstName(),
@@ -115,7 +111,7 @@ const sessionFill = async () => {
 
     try {
 
-        const students_local = await Student.findAll();
+        const students_local = await StudentModel.findAll();
         const employeeCount = await Employee.count();
 
         const sessions:object[] = []
@@ -140,7 +136,7 @@ const sessionFill = async () => {
 }
 const paymentFill = async (res: any, number: number) => {
     try {
-        const students = await Student.findAll(); // Fetch all existing students
+        const students = await StudentModel.findAll(); // Fetch all existing students
         const studentIds = students.map((student) => student.id); // Extract student ids
 
         for (let i = 0; i < number; i++) {
@@ -162,7 +158,7 @@ const paymentFill = async (res: any, number: number) => {
 }
 const dropdata = async () => {
     try {
-        await Student.sync({force: true})
+        await StudentModel.sync({force: true})
         await Employee.sync({force: true})
         return true
     } catch (err) {

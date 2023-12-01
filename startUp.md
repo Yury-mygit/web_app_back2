@@ -314,11 +314,22 @@ npm install winston
 
 ```
 
+## DOTENV
+```bash
+npm i dotenv
+```
+
+
 ## FAKER
 https://www.npmjs.com/package/@faker-js/faker
 
 ```bash
 npm install --save-dev @faker-js/faker
+```
+
+cookie-parser
+```BASH
+$ npm install cookie-parser
 ```
 
 This will log all errors to error.log and all logs to combined.log.

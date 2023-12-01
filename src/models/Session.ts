@@ -1,16 +1,17 @@
 import { Model, Column, Table, AutoIncrement, PrimaryKey, AllowNull, DataType, ForeignKey } from 'sequelize-typescript';
-import  Student  from './Student';
+import  StudentModel  from './StudentModel';
 import  Employee  from './Employee';
 import  Office  from './Office';
 import  Payment  from './Payment';
 import {sequelize} from "../database/database";
 
-enum ServiceType {
-    // Define your service types here
+export enum ServiceType {
+    mas = 'Логопедический массаж',
+    log = 'Логопедическое занятие',
 }
 
-enum Status {
-    // Define your statuses here
+export enum Status {
+    active = 'active',
 }
 
 @Table({ tableName: 'session' })
@@ -44,7 +45,7 @@ class Session extends Model {
     @Column
     confirmed!: boolean;
 
-    @ForeignKey(() => Student)
+    @ForeignKey(() => StudentModel)
     @Column
     student_id!: number;
 

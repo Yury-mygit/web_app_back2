@@ -1,0 +1,21 @@
+paths:
+  /students/:
+    post:
+      tags:
+        - StudentModel
+      summary: Create a new student
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: './schemas.yaml#/StudentIn'
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: './schemas.yaml#/StudentOut'
+
+
