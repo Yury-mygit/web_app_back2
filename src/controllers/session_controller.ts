@@ -3,7 +3,7 @@ import { validationResult } from 'express-validator';
 import {l} from '../servises/serv'
 
 class SessionController {
-    async getAllStudents(req:any, res:any, next:any){
+    async getAllSessions(req:any, res:any, next:any){
         try {
             const skip = parseInt(req.query.skip as string) || 0;
             const limit = parseInt(req.query.limit as string) || 100;
@@ -24,7 +24,7 @@ class SessionController {
         }
     }
 
-    async createStudent(req:any, res:any, next:any){
+    async createSession(req:any, res:any, next:any){
         const tempdata = {
             firstName: req.body.firstName,
             lastName: req.body.lastName,
@@ -48,7 +48,7 @@ class SessionController {
         }
     }
 
-    async updateStudent(req: any, res: any, next: any) {
+    async updateSession(req: any, res: any, next: any) {
         // l( req.body, ' req.body')
 
 
@@ -110,12 +110,12 @@ class SessionController {
                 res.status(404).json({ message: 'Student not found' });
             }
         } catch (err: any) {
-            console.log(err)
+            // console.log(err)
             res.status(500).json(err);
         }
     }
 
-    async deleteStudent(req:any, res:any, next:any){
+    async deleteSession(req:any, res:any, next:any){
         try {
             const studentId = req.params.id;
             await SessionModel.destroy({ where: { id: studentId } });

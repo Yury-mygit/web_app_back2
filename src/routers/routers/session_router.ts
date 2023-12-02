@@ -1,28 +1,7 @@
 import express from 'express';
-import {ServiceType, Status } from "../../models/session_model";
-import Session from "../../models/session_model"
 import sessionController from "../../controllers/session_controller"
 
 const router = express.Router();
-
-// interface ISession {
-//     id: number;
-//     startDateTime: string;
-//     duration: number;
-//     week_first_day: string;
-//     online: boolean;
-//     paid: boolean;
-//     confirmed: boolean;
-//     student_id: number;
-//     employee_id: number;
-//     repeatable: boolean;
-//     notes: string;
-//     office_id: number;
-//     performed: boolean;
-//     serviceType: ServiceType;
-//     status: Status;
-//     payment_id: number;
-// }
 
 /**
  * @openapi
@@ -95,13 +74,9 @@ const router = express.Router();
  *           description: Student updated successfully
  */
 
-router.get('/', sessionController.getAllStudents);
-// Define your students routes here
-
-router.patch('/',sessionController.updateStudent)
-
-router.post('/', sessionController.createStudent)
-
-router.delete('/', sessionController.deleteStudent)
+router.get('/', sessionController.getAllSessions);
+router.patch('/',sessionController.updateSession)
+router.post('/', sessionController.createSession)
+router.delete('/', sessionController.deleteSession)
 
 export default router;

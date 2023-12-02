@@ -171,6 +171,7 @@ class FakeData_Controller {
                         randomHour = this.getRandomElement2([9,10,11,12,13,14,15,16,17,18,18,20]);
 
                         // Create a string that represents the day and hour
+                        console.log(`${randomDay}-${randomHour}`)
                         timeString = `${randomDay}-${randomHour}`;
                     } while (uniqueTimes.has(timeString));
 
@@ -202,21 +203,17 @@ class FakeData_Controller {
             for (const session of sessions) {
 
                 const date = new Date();
+                const currentDay = date.getUTCDay();  // Get the current day of the week (0-6)
+                const daysToAdd = ((session.day - currentDay) + 7) % 7; // Calculate the number of days to add or subtract
+                date.setUTCDate(date.getUTCDate() + daysToAdd);  // Set the day of the week
 
-// Get the current day of the week (0-6)
-                const currentDay = date.getUTCDay();
 
-// Calculate the number of days to add or subtract
-                const daysToAdd = ((session.day - currentDay) + 7) % 7;
+                date.setUTCHours(session.time-3, 0, 0, 0); // The minutes, seconds, and milliseconds are set to 0 // Set the hour
 
-// Set the day of the week
-                date.setUTCDate(date.getUTCDate() + daysToAdd);
 
-// Set the hour
-                date.setUTCHours(session.time, 0, 0, 0); // The minutes, seconds, and milliseconds are set to 0
+                const moscowTime = date.toLocaleString('en-US', { timeZone: 'Europe/Moscow' });; // Get the time in the Moscow time zone
 
-// Get the time in the Moscow time zone
-                const moscowTime = date.toISOString();
+                console.log(moscowTime)
 
                 const ses: Partial<I_Session>  = {
                     startDateTime: moscowTime,
