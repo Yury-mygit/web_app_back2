@@ -1,8 +1,8 @@
 import { Model, Column, Table, AutoIncrement, PrimaryKey, AllowNull, DataType, ForeignKey } from 'sequelize-typescript';
 import  Student_model  from './student_model';
-import  Employee  from './Employee';
-import  Office  from './Office';
-import  Payment  from './Payment';
+import  Employee_model  from './employee_model';
+import  Office_model  from './office_model';
+import  Payment_model  from './payment_model';
 import {sequelize} from "../database/database";
 
 export enum ServiceType {
@@ -49,7 +49,7 @@ class SessionModel extends Model {
     @Column
     student_id!: number;
 
-    @ForeignKey(() => Employee)
+    @ForeignKey(() => Employee_model)
     @Column
     employee_id!: number;
 
@@ -61,7 +61,7 @@ class SessionModel extends Model {
     @Column(DataType.TEXT)
     notes!: string;
 
-    @ForeignKey(() => Office)
+    @ForeignKey(() => Office_model)
     @Column
     office_id!: number;
 
@@ -77,7 +77,7 @@ class SessionModel extends Model {
     @Column(DataType.ENUM(...Object.values(Status)))
     status!: Status;
 
-    @ForeignKey(() => Payment)
+    @ForeignKey(() => Payment_model)
     @Column
     payment_id!: number;
 }

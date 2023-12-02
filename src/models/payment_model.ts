@@ -15,7 +15,7 @@ export enum SubscriptionType {
 }
 
 @Table({ tableName: 'payment' })
-class Payment extends Model {
+class PaymentModel extends Model {
     @AutoIncrement
     @PrimaryKey
     @Column
@@ -41,6 +41,6 @@ class Payment extends Model {
 
 }
 
-sequelize.addModels([Payment])
+sequelize.addModels([PaymentModel])
 
-export default Payment
+export default PaymentModel

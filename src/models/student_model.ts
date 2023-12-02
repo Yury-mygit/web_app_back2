@@ -6,7 +6,7 @@ enum Status {
 }
 
 @Table({ tableName: 'students' })
-export class StudentModel extends Model {
+export class Student_model extends Model {
     @AutoIncrement
     @PrimaryKey
     @Column
@@ -86,6 +86,6 @@ export class StudentModel extends Model {
 
 
 
-sequelize.addModels([StudentModel]);
+sequelize.addModels([Student_model]);
 
-export default StudentModel;
+export default Student_model;

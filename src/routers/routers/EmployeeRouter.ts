@@ -1,5 +1,5 @@
 import express from 'express';
-import Employee from "../../models/Employee";
+import Employee_model from "../../models/employee_model";
 
 const router = express.Router();
 
@@ -20,12 +20,42 @@ interface response_int{
     id:number
 }
 
+/**
+ * @openapi
+ * paths:
+ *   /employee/:
+ *     get:
+ *       tags:
+ *         - Employee
+ *       summary: The api for gathering offices
+ *       description: The api for gathering offices
+ *       parameters:
+ *         - name: skip
+ *           in: query
+ *           description: Number of items to skip before starting to collect the result set
+ *           required: false
+ *           schema:
+ *             type: integer
+ *             format: int32
+ *           default: 0
+ *         - name: limit
+ *           in: query
+ *           description: Limits the number of items in the result set
+ *           required: false
+ *           schema:
+ *             type: integer
+ *             format: int32
+ *           default: 20
+ *       responses:
+ *         '200':
+ *           description: Successful operation
+ */
 router.get('/', async (req, res) => {
     try {
         const skip = parseInt(req.query.skip as string) || 0;
         const limit = parseInt(req.query.limit as string) || 100;
 
-        const emploees = await Employee.findAll({
+        const emploees = await Employee_model.findAll({
             offset: skip,
             limit: limit,
             order:['id']

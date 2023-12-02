@@ -1,6 +1,6 @@
 import Student_model from "../models/student_model";
 
-class StudentController {
+class Student_controller {
     async getAllStudents(req:any, res:any, next:any){
         try {
             const skip = parseInt(req.query.skip as string) || 0;
@@ -82,4 +82,4 @@ class StudentController {
     }
 }
 
-export default new StudentController();
+export default new Student_controller();

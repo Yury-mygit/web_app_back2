@@ -1,10 +1,10 @@
 import express from 'express';
-import studentsRouter from './routers/StudentRouter';
+import studentsRouter from './routers/student_router';
 import employeesRouter from './routers/EmployeeRouter';
-import sessionsRouter from './routers/SessionRouter';
-import officesRouter from './routers/OfficeRouter';
-import paymentsRouter from './routers/PaymentRouter';
-import testRouter from './routers/TestRouter'
+import sessionsRouter from './routers/session_router';
+import officesRouter from './routers/office_router';
+import paymentsRouter from './routers/payment_router';
+import testRouter from './routers/test_router'
 
 const router = express.Router();
 

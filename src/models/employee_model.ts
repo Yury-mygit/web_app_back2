@@ -6,7 +6,7 @@ enum Status {
 }
 
 @Table({ tableName: 'employee' })
-class Employee extends Model {
+class Employee_model extends Model {
     @AutoIncrement
     @PrimaryKey
     @Column
@@ -61,6 +61,6 @@ class Employee extends Model {
     experience_years!: number;
 }
 
-sequelize.addModels([Employee])
+sequelize.addModels([Employee_model])
 
-export default Employee
+export default Employee_model

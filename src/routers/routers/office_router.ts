@@ -1,5 +1,6 @@
 import express from 'express';
 import Office_model from '../../models/office_model'
+import controller from '../../controllers/office_controller'
 
 const router = express.Router();
 
@@ -33,26 +34,7 @@ const router = express.Router();
  *         '200':
  *           description: Successful operation
  */
-router.get('/', async (req, res) => {
-    try {
-        const skip = parseInt(req.query.skip as string) || 0;
-        const limit = parseInt(req.query.limit as string) || 20;
-
-        const offices = await Office_model.findAll({
-            offset: skip,
-            limit: limit,
-            order:['id']
-        });
-
-        res.json(offices);
-    } catch (err) {
-        if (err instanceof Error) {
-            res.status(500).json({ error: err.message });
-        } else {
-            res.status(500).json({ error: 'An unknown error occurred' });
-        }
-    }
-});
+router.get('/', controller.getAll);
 // Define your students routes here
 
 

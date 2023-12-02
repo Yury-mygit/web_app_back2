@@ -30,18 +30,17 @@ const swaggerOptions = {
             { name: 'Session' },
             { name: 'Payment' },
             { name: 'Tilda' },
-            { name: 'Test routes' },
         ],
     },
     apis: [
         './src/app.ts',
         './src/routers/index.ts',
-        './src/routers/routers/TestRouter.ts',
-        './src/routers/routers/StudentRouter.ts',
-        './src/routers/routers/OfficeRouter.ts',
-        './src/routers/routers/SessionRouter.ts',
-        './src/routers/routers/PaymentRouter.ts',
-        './src/routers/routers/EmployeesRouter.ts'
+        './src/routers/routers/test_router.ts',
+        './src/routers/routers/student_router.ts',
+        './src/routers/routers/office_router.ts',
+        './src/routers/routers/session_router.ts',
+        './src/routers/routers/payment_router.ts',
+        './src/routers/routers/EmployeeRouter.ts'
     ],
 };
 const swaggerDocs = swaggerJsDoc(swaggerOptions);

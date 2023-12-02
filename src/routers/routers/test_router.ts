@@ -2,10 +2,11 @@ import express from 'express';
 import { Student_model } from '../../models/student_model';
 import { faker } from '@faker-js/faker';
 import {sequelize} from '../../database/database'
-import Employee from "../../models/Employee";
+import Employee_model from "../../models/employee_model";
 import Office_model from "../../models/office_model";
 import Payment_model, { PaymentStatus, SubscriptionType} from "../../models/payment_model";
 import {error} from "winston";
+import fakeData_Controller from "../../controllers/fake_controller";
 
 const router = express.Router();
 
@@ -23,15 +24,20 @@ function getRandomElement<T>(array: T[]): T | undefined {
  * /test/fill:
  *   post:
  *     tags:
- *        - Test routes
- *     description: Fill database with test random data
+ *        - Fake routes
+ *     description: Fill database with fake random data
  *     responses:
  *       200:
  *         description: Returns a success message.
  */
 router.post('/fill', async (req, res) => {
-    dropdata().then(()=>Promise.all([studentfill(5), employeefill(3), officeFill(2),]))
-    .then(()=>sessionFill())
+    fakeData_Controller.dropdata().then(()=>
+        Promise.all([
+            fakeData_Controller.studentfill(5),
+            fakeData_Controller.employeefill(3),
+            fakeData_Controller.officeFill(2)
+        ]))
+    .then(()=>fakeData_Controller.sessionFill())
     .then(() => {
         res.status(200).json({ status: 'ok', desk: 'All good' });
     })
@@ -72,7 +78,7 @@ const employeefill = async ( number: number) => {
             let dateOfInitialDiagnosis = new Date();
             dateOfInitialDiagnosis.setDate(dateOfInitialDiagnosis.getDate() - 7);
 
-            await Employee.create({
+            await Employee_model.create({
                 status:'active',
                 position:'speech therapist',
                 profession:'speech therapist',
@@ -112,7 +118,7 @@ const sessionFill = async () => {
     try {
 
         const students_local = await Student_model.findAll();
-        const employeeCount = await Employee.count();
+        const employeeCount = await Employee_model.count();
 
         const sessions:object[] = []
 
@@ -159,7 +165,7 @@ const paymentFill = async (res: any, number: number) => {
 const dropdata = async () => {
     try {
         await Student_model.sync({force: true})
-        await Employee.sync({force: true})
+        await Employee_model.sync({force: true})
         return true
     } catch (err) {
         // if (err instanceof Error) {

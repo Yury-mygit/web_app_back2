@@ -3,7 +3,7 @@ import {sequelize} from "../database/database";
 import Student_model from "./student_model";
 
 @Table({tableName:'office'})
-class Office extends Model {
+class Office_model extends Model {
     @AutoIncrement
     @PrimaryKey
     @Column
@@ -14,6 +14,6 @@ class Office extends Model {
     address!: string;
 }
 
-sequelize.addModels([Office]);
+sequelize.addModels([Office_model]);
 
-export default  Office
+export default  Office_model
