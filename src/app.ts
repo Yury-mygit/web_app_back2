@@ -48,8 +48,8 @@ const swaggerDocs = swaggerJsDoc(swaggerOptions);
 app.use(express.json())
 app.use(cookieParser())
 app.use(cors({
-    origin: 'http://localhost:3002'
-})); // Use cors as a middlewar
+    origin: ['http://localhost:3002','http://localhost:3000']
+}));
 app.use(bodyParser.json()); // for parsing application/json
 app.use(bodyParser.urlencoded({ extended: true })); // for parsing application/x-www-form-urlencoded
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocs));

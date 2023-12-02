@@ -1,4 +1,6 @@
-import SessionModel from "../models/session_model";
+import SessionModel, {ServiceType, Status} from "../models/session_model";
+import { validationResult } from 'express-validator';
+import {l} from '../servises/serv'
 
 class SessionController {
     async getAllStudents(req:any, res:any, next:any){
@@ -46,28 +48,70 @@ class SessionController {
         }
     }
 
-    async updateStudent(req:any, res:any, next:any){
-        const tempdata = {
+    async updateStudent(req: any, res: any, next: any) {
+        // l( req.body, ' req.body')
 
-            firstName: req.body.firstName,
-            lastName: req.body.lastName,
-            parentsName: req.body.firstName,
-            age: req.body.age,
-            status: 'active',
-            sessionTransferRate: 0.05,
-            percentageOfAbsences: 0.02,
-            contactEmail: req.body.contactEmail,
-            contactTelephone: req.body.contactTelephone,
-            dateOfInitialDiagnosis: req.body.dateOfInitialDiagnosis,
-            address: req.body.address
+
+        const { body } = req;
+        const validationRules = {
+            id: 'number',
+            startDateTime: 'string',
+            duration: 'number',
+            week_first_day: 'string',
+            online: 'boolean',
+            paid: 'boolean',
+            confirmed: 'boolean',
+            student_id: 'number',
+            employee_id: 'number',
+            repeatable: 'boolean',
+            notes: 'string',
+            office_id: 'number',
+            performed: 'boolean',
+            serviceType: ServiceType,
+            status: Status,
+            payment_id: 'number',
+        };
+
+        // Validate the request body
+        const errors = validationResult(req);
+        if (!errors.isEmpty()) {
+            return res.status(400).json({ errors: errors.array() });
         }
 
+
+
         try {
-            const studentId = req.body.id;
-            await SessionModel.update(tempdata, { where: { id: studentId } });
-            res.json({ message: 'Student_model updated successfully' });
+            const sesssionId = req.body.id;
+
+            const upd_Session = {
+                id:req.body.id,
+                startDateTime: req.body.startDateTime,
+                duration: req.body.duration,
+                week_first_day: req.body.week_first_day,
+                online: req.body.online,
+                paid: req.body.paid,
+                confirmed: req.body.confirmed,
+                student_id: req.body.student_id,
+                employee_id: req.body.employee_id,
+                repeatable: req.body.repeatable,
+                notes: req.body.notes,
+                office_id: req.body.office_id,
+                performed: req.body.performed,
+                serviceType: ServiceType.log,
+                status: Status.active,
+                payment_id: req.body.payment_id,
+            }
+
+            const [rowsUpdated, [updatedStudentData]] = await SessionModel.update(upd_Session, { where: { id: sesssionId }, returning: true });
+
+            if (rowsUpdated > 0) {
+                res.json({ message: 'Student_model updated successfully', updatedStudent: updatedStudentData });
+            } else {
+                res.status(404).json({ message: 'Student not found' });
+            }
         } catch (err: any) {
-            res.status(500).json(err)
+            console.log(err)
+            res.status(500).json(err);
         }
     }
 

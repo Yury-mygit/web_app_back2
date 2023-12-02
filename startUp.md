@@ -332,6 +332,10 @@ cookie-parser
 $ npm install cookie-parser
 ```
 
+```bash
+npm i express-validator
+```
+
 This will log all errors to error.log and all logs to combined.log.
 Remember to place the error handling middleware after all your routes, so that any errors that occur while handling requests will be passed to it.
 

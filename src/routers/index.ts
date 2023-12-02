@@ -9,11 +9,11 @@ import testRouter from './routers/test_router'
 const router = express.Router();
 
 router.use('/students', studentsRouter);
-router.use('/employees', employeesRouter);
+router.use('/employee', employeesRouter);
 router.use('/session', sessionsRouter);
 router.use('/offices', officesRouter);
 router.use('/payments', paymentsRouter);
-router.use('/test', testRouter)
+router.use('/fake', testRouter)
 
 // router.post('/registration')
 // router.post('/login')

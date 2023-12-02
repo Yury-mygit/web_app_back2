@@ -14,6 +14,25 @@ export enum Status {
     active = 'active',
 }
 
+export interface I_Session {
+    id?: number;
+    startDateTime: string;
+    duration: number;
+    week_first_day: string;
+    online: boolean;
+    paid: boolean;
+    confirmed: boolean;
+    student_id: number;
+    employee_id: number;
+    repeatable: boolean;
+    notes: string;
+    office_id: number;
+    performed: boolean;
+    serviceType: ServiceType;
+    status: Status;
+    payment_id: number;
+}
+
 @Table({ tableName: 'session' })
 class SessionModel extends Model {
     @AutoIncrement
