@@ -1,5 +1,5 @@
 import { Model, Column, Table, AutoIncrement, PrimaryKey, AllowNull, DataType, ForeignKey } from 'sequelize-typescript';
-import { StudentModel } from './student-model';
+import { Student_model } from './student_model';
 import {sequelize} from "../database/database";
 
 export enum PaymentStatus {
@@ -21,7 +21,7 @@ class Payment extends Model {
     @Column
     id!: number;
 
-    @ForeignKey(() => StudentModel)
+    @ForeignKey(() => Student_model)
     @Column
     student_id!: number;
 

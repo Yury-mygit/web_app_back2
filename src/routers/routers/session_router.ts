@@ -1,6 +1,7 @@
 import express from 'express';
-import {ServiceType, Status } from "../../models/Session";
-import Session from "../../models/Session"
+import {ServiceType, Status } from "../../models/session_model";
+import Session from "../../models/session_model"
+import sessionController from "../../controllers/session_controller"
 
 const router = express.Router();
 
@@ -51,26 +52,7 @@ interface ISession {
  *         '200':
  *           description: Successful operation
  */
-router.get('/', async (req, res) => {
-    try {
-        const skip = parseInt(req.query.skip as string) || 0;
-        const limit = parseInt(req.query.limit as string) || 100;
-
-        const students = await Session.findAll({
-            offset: skip,
-            limit: limit,
-            order:['id']
-        });
-
-        res.json(students);
-    } catch (err) {
-        if (err instanceof Error) {
-            res.status(500).json({ error: err.message });
-        } else {
-            res.status(500).json({ error: 'An unknown error occurred' });
-        }
-    }
-});
+router.get('/', sessionController.getAllStudents);
 // Define your students routes here
 
 export default router;

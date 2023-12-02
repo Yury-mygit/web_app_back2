@@ -1,10 +1,10 @@
 import express from 'express';
-import { StudentModel } from '../../models/student-model';
+import { Student_model } from '../../models/student_model';
 import { faker } from '@faker-js/faker';
 import {sequelize} from '../../database/database'
 import Employee from "../../models/Employee";
-import Office from "../../models/Office";
-import Payment, { PaymentStatus, SubscriptionType} from "../../models/Payment";
+import Office_model from "../../models/office_model";
+import Payment_model, { PaymentStatus, SubscriptionType} from "../../models/payment_model";
 import {error} from "winston";
 
 const router = express.Router();
@@ -47,7 +47,7 @@ const studentfill = async ( number: number) => {
             let dateOfInitialDiagnosis = new Date();
             dateOfInitialDiagnosis.setDate(dateOfInitialDiagnosis.getDate() - 7);
 
-            await StudentModel.create({
+            await Student_model.create({
                 firstName: faker.person.firstName(),
                 lastName: faker.person.lastName(),
                 parentsName: faker.person.firstName(),
@@ -96,7 +96,7 @@ const employeefill = async ( number: number) => {
 const officeFill = async (number: number) => {
     try {
         for (let i = 0; i < number; i++) {
-            await Office.create({
+            await Office_model.create({
                 address: faker.location.streetAddress(),
             });
         }
@@ -111,7 +111,7 @@ const sessionFill = async () => {
 
     try {
 
-        const students_local = await StudentModel.findAll();
+        const students_local = await Student_model.findAll();
         const employeeCount = await Employee.count();
 
         const sessions:object[] = []
@@ -136,13 +136,13 @@ const sessionFill = async () => {
 }
 const paymentFill = async (res: any, number: number) => {
     try {
-        const students = await StudentModel.findAll(); // Fetch all existing students
+        const students = await Student_model.findAll(); // Fetch all existing students
         const studentIds = students.map((student) => student.id); // Extract student ids
 
         for (let i = 0; i < number; i++) {
             const randomStudentId = getRandomElement(studentIds)
 
-            await Payment.create({
+            await Payment_model.create({
                 student_id: randomStudentId,
                 status: PaymentStatus.NEW,
                 subscription_type: SubscriptionType.ONE_LESSON
@@ -158,7 +158,7 @@ const paymentFill = async (res: any, number: number) => {
 }
 const dropdata = async () => {
     try {
-        await StudentModel.sync({force: true})
+        await Student_model.sync({force: true})
         await Employee.sync({force: true})
         return true
     } catch (err) {

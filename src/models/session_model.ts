@@ -1,5 +1,5 @@
 import { Model, Column, Table, AutoIncrement, PrimaryKey, AllowNull, DataType, ForeignKey } from 'sequelize-typescript';
-import  StudentModel  from './student-model';
+import  Student_model  from './student_model';
 import  Employee  from './Employee';
 import  Office  from './Office';
 import  Payment  from './Payment';
@@ -15,7 +15,7 @@ export enum Status {
 }
 
 @Table({ tableName: 'session' })
-class Session extends Model {
+class SessionModel extends Model {
     @AutoIncrement
     @PrimaryKey
     @Column
@@ -45,7 +45,7 @@ class Session extends Model {
     @Column
     confirmed!: boolean;
 
-    @ForeignKey(() => StudentModel)
+    @ForeignKey(() => Student_model)
     @Column
     student_id!: number;
 
@@ -82,6 +82,6 @@ class Session extends Model {
     payment_id!: number;
 }
 
-sequelize.addModels([Session]);
+sequelize.addModels([SessionModel]);
 
-export default Session;
+export default SessionModel;

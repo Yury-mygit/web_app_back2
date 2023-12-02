@@ -1,6 +1,6 @@
 import { Table, Column, Model, DataType, CreatedAt, UpdatedAt, AutoIncrement, PrimaryKey, AllowNull, Unique, Default } from 'sequelize-typescript';
 import {sequelize} from "../database/database";
-import StudentModel from "./student-model";
+import Student_model from "./student_model";
 
 @Table({tableName:'office'})
 class Office extends Model {

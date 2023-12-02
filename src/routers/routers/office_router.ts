@@ -1,5 +1,5 @@
 import express from 'express';
-import Office from '../../models/Office'
+import Office_model from '../../models/office_model'
 
 const router = express.Router();
 
@@ -38,7 +38,7 @@ router.get('/', async (req, res) => {
         const skip = parseInt(req.query.skip as string) || 0;
         const limit = parseInt(req.query.limit as string) || 20;
 
-        const offices = await Office.findAll({
+        const offices = await Office_model.findAll({
             offset: skip,
             limit: limit,
             order:['id']

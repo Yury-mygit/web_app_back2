@@ -1,13 +1,7 @@
 import express from 'express';
-import StudentModel from '../../models/student-model';
 import studentController from "../../controllers/student-controller";
-import {faker} from "@faker-js/faker";
 
 const router = express.Router();
-
-const { getAll } = studentController;
-const boundGetAll = getAll.bind(studentController);
-
 
 /**
  * @openapi
@@ -37,7 +31,7 @@ const boundGetAll = getAll.bind(studentController);
  *         '200':
  *           description: Successful operation
  */
-router.get('/', boundGetAll);
+router.get('/', studentController.getAllStudents);
 
 /**
  * @openapi
@@ -120,29 +114,7 @@ router.get('/', boundGetAll);
  *                     type: integer
  *                     description: Custom error code indicating the specific error
  */
-router.post('/', async (req, res) => {
-    const tempdata = {
-        firstName: req.body.firstName,
-        lastName: req.body.lastName,
-        parentsName: req.body.firstName,
-        age: req.body.age,
-        status: 'active',
-        sessionTransferRate: 0.05,
-        percentageOfAbsences: 0.02,
-        contactEmail: req.body.contactEmail,
-        contactTelephone: req.body.contactTelephone,
-        dateOfInitialDiagnosis: req.body.dateOfInitialDiagnosis,
-        address: req.body.address
-    }
-
-    try {
-        const studentData = req.body;
-        const student = await StudentModel.create(tempdata);
-        res.json(student.id);
-    } catch (err: any) {
-        res.status(500).json(err)
-    }
-});
+router.post('/', studentController.createStudent);
 
 /**
  * @openapi
@@ -225,30 +197,7 @@ router.post('/', async (req, res) => {
  *                     type: integer
  *                     description: Custom error code indicating the specific error
  */
-router.patch('/', async (req, res) => {
-    const tempdata = {
-
-        firstName: req.body.firstName,
-        lastName: req.body.lastName,
-        parentsName: req.body.firstName,
-        age: req.body.age,
-        status: 'active',
-        sessionTransferRate: 0.05,
-        percentageOfAbsences: 0.02,
-        contactEmail: req.body.contactEmail,
-        contactTelephone: req.body.contactTelephone,
-        dateOfInitialDiagnosis: req.body.dateOfInitialDiagnosis,
-        address: req.body.address
-    }
-
-    try {
-        const studentId = req.body.id;
-        await StudentModel.update(tempdata, { where: { id: studentId } });
-        res.json({ message: 'StudentModel updated successfully' });
-    } catch (err: any) {
-        res.status(500).json(err)
-    }
-});
+router.patch('/', studentController.updateStudent);
 
 /**
  * @openapi
@@ -261,14 +210,6 @@ router.patch('/', async (req, res) => {
  *       200:
  *         description: Returns a success message.
  */
-router.delete('/:id', async (req, res) => {
-    try {
-        const studentId = req.params.id;
-        await StudentModel.destroy({ where: { id: studentId } });
-        res.json({ message: 'StudentModel deleted successfully' });
-    } catch (err: any) {
-        res.status(500).json(err)
-    }
-});
+router.delete('/:id', studentController.deleteStudent);
 
 export default router;
