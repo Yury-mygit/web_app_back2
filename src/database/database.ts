@@ -1,7 +1,7 @@
 import { Sequelize } from 'sequelize-typescript';
 
 export const sequelize = new Sequelize({
-    database: 'user',
+    database: 'gs',
     dialect: 'postgres',
     username: 'postgres',
     password: '321',

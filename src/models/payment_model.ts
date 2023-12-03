@@ -1,5 +1,15 @@
-import { Model, Column, Table, AutoIncrement, PrimaryKey, AllowNull, DataType, ForeignKey } from 'sequelize-typescript';
-import { Student_model } from './student_model';
+import {
+    Model,
+    Column,
+    Table,
+    AutoIncrement,
+    PrimaryKey,
+    AllowNull,
+    DataType,
+    ForeignKey
+} from 'sequelize-typescript';
+import { User_model } from './user/user_model';
+import { Optional } from 'sequelize';
 import {sequelize} from "../database/database";
 
 export enum PaymentStatus {
@@ -14,16 +24,25 @@ export enum SubscriptionType {
     EIGHT_LESSONS = 8
 }
 
+export interface PayAttributes{
+    id: number;
+    student_id: number;
+    status: PaymentStatus;
+    pay_type: SubscriptionType
+}
+
+export interface PayCreationAttributes extends Optional<PayAttributes, 'id'> {}
+
 @Table({ tableName: 'payment' })
 class PaymentModel extends Model {
     @AutoIncrement
     @PrimaryKey
     @Column
-    id!: number;
+    pay_id!: number;
 
-    @ForeignKey(() => Student_model)
+    @ForeignKey(() => User_model)
     @Column
-    student_id!: number;
+    user_id!: number;
 
     @AllowNull(false)
     @Column(DataType.ENUM({values: Object.values(PaymentStatus)}))
@@ -31,7 +50,7 @@ class PaymentModel extends Model {
 
     @AllowNull(false)
     @Column
-    get subscription_type(): SubscriptionType {
+    get pay_type(): SubscriptionType {
         return this.getDataValue('subscription_type');
     }
 

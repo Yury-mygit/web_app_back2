@@ -1,28 +1,25 @@
 import { Sequelize, Table, Column, Model, DataType,  CreatedAt, UpdatedAt, AutoIncrement, PrimaryKey, AllowNull, Unique, Default } from 'sequelize-typescript';
-import { sequelize } from '../database/database';
-enum Status {
-    ACTIVE = "active",
-    INACTIVE = "inactive"
-}
+import { sequelize } from '../../database/database';
+import {UserStatus} from "../../interface/user_interface";
 
-@Table({ tableName: 'students' })
-export class Student_model extends Model {
+@Table({ tableName: 'users' })
+export class User_model extends Model {
     @AutoIncrement
     @PrimaryKey
     @Column
-    id!: number;
+    user_id!: number;
 
     @AllowNull(false)
     @Column
-    firstName!: string;
+    name!: string;
 
     @AllowNull(false)
     @Column
-    lastName!: string;
+    surname!: string;
 
-    @AllowNull(false)
+    @AllowNull(true)
     @Column
-    parentsName!: string;
+    parents!: string;
 
     @AllowNull(false)
     @Column(DataType.INTEGER)
@@ -30,45 +27,44 @@ export class Student_model extends Model {
 
     @AllowNull(false)
     @Column(DataType.ENUM('active', 'inactive'))
-    status!: Status;
+    status!: UserStatus;
 
     @AllowNull(false)
     @Column(DataType.FLOAT)
-    sessionTransferRate!: number;
+    attendance!: number;
 
     @AllowNull(false)
     @Column(DataType.FLOAT)
-    percentageOfAbsences!: number;
-
-    @AllowNull(false)
-
-    @Column
-    contactEmail!: string;
+    absences!: number;
 
     @AllowNull(false)
     @Column
-    contactTelephone!: string;
+    email!: string;
+
+    @AllowNull(false)
+    @Column
+    telephone!: string;
 
     @Default(false)
     @Column
-    allowTelegramNotification!: boolean;
+    telegram_notification!: boolean;
 
     @Column(DataType.BIGINT)
-    telegramId!: number;
+    telegram_id!: number;
 
     @Column(DataType.TEXT)
     issue!: string;
 
-    @AllowNull(false)
+    @AllowNull(true)
     @Column
-    dateOfInitialDiagnosis!: string;
+    initial_diagnosis_date!: string;
 
     @AllowNull(false)
     @Column(DataType.TEXT)
     address!: string;
 
     @Column(DataType.TEXT)
-    foundUsThrough!: string;
+    found_through!: string;
 
     @Default(false)
     @Column
@@ -86,6 +82,6 @@ export class Student_model extends Model {
 
 
 
-sequelize.addModels([Student_model]);
+sequelize.addModels([User_model]);
 
-export default Student_model;
+export default User_model;

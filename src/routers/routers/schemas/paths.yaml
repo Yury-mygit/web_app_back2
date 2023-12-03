@@ -2,7 +2,7 @@ paths:
   /students/:
     post:
       tags:
-        - Student_model
+        - User_model
       summary: Create a new student
       requestBody:
         required: true

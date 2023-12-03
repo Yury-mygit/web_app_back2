@@ -29,18 +29,19 @@ const swaggerOptions = {
             { name: 'Office' },
             { name: 'Session' },
             { name: 'Payment' },
-            { name: 'Tilda' },
+            { name: 'Tilda endpoint' },
         ],
     },
     apis: [
         './src/app.ts',
         './src/routers/index.ts',
-        './src/routers/routers/test_router.ts',
+        './src/routers/routers/fake_router.ts',
         './src/routers/routers/student_router.ts',
         './src/routers/routers/office_router.ts',
         './src/routers/routers/session_router.ts',
         './src/routers/routers/payment_router.ts',
-        './src/routers/routers/EmployeeRouter.ts'
+        './src/routers/routers/employee_router.ts',
+        './src/routers/routers/tilda_router.ts'
     ],
 };
 const swaggerDocs = swaggerJsDoc(swaggerOptions);

@@ -1,11 +1,4 @@
 import express from 'express';
-import { Student_model } from '../../models/student_model';
-import { faker } from '@faker-js/faker';
-import {sequelize} from '../../database/database'
-import Employee_model from "../../models/employee_model";
-import Office_model from "../../models/office_model";
-import Payment_model, { PaymentStatus, SubscriptionType} from "../../models/payment_model";
-import {error} from "winston";
 import fakeData_Controller from "../../controllers/fake_controller";
 
 const router = express.Router();

@@ -1,5 +1,5 @@
 import { Model, Column, Table, AutoIncrement, PrimaryKey, AllowNull, DataType, ForeignKey } from 'sequelize-typescript';
-import  Student_model  from './student_model';
+import  User_model  from './user/user_model';
 import  Employee_model  from './employee_model';
 import  Office_model  from './office_model';
 import  Payment_model  from './payment_model';
@@ -64,7 +64,7 @@ class SessionModel extends Model {
     @Column
     confirmed!: boolean;
 
-    @ForeignKey(() => Student_model)
+    @ForeignKey(() => User_model)
     @Column
     student_id!: number;
 

@@ -2,10 +2,37 @@
 *  Payment Controller
 */
 import PaymentModel  from '../models/payment_model'
-
+import {  validationResult, checkSchema,  check, oneOf ,  body, query } from 'express-validator';
+import {ServiceType, Status} from "../models/session_model";
 
 class PaymentController{
-    async getAllPayments(req:any, res:any, next:any){
+    async getAllPays(req:any, res:any, next:any){
+
+        // return res.status(400).json({ errors: 'sdsadd' });
+        //
+        // Define validation rules
+        console.log(req.body)
+        // const validationRules = [
+        //     body('user_id').isNumeric().toInt().optional(),
+        //     query('user_id').isNumeric().toInt().optional(),
+        //     body('skip').isNumeric().toInt().optional(),
+        //     query('skip').isNumeric().toInt().optional(),
+        //     body('limit').isNumeric().toInt().optional(),
+        //     query('limit').isNumeric().toInt().optional()
+        // ];
+        //
+        // // Validate the request
+        // await Promise.all(validationRules.map(rule => rule.run(req)));
+
+        // Check for validation errors
+        const errors = validationResult(req);
+        console.log(errors)
+        if (!errors.isEmpty()) {
+            return res.status(400).json({ errors: errors.array() });
+        }
+
+        const payload = req.body
+
         try {
             const skip = parseInt(req.query.skip as string) || 0;
             const limit = parseInt(req.query.limit as string) || 100;
@@ -13,7 +40,7 @@ class PaymentController{
             const students = await PaymentModel.findAll({
                 offset: skip,
                 limit: limit,
-                order:['id']
+                order:['pay_id']
             });
 
             res.json(students);
@@ -26,7 +53,7 @@ class PaymentController{
         }
     }
 
-    async createPayment(req:any, res:any, next:any){
+    async AcceptPayment(req:any, res:any, next:any){
 
         const data = {
             firstName: req.body.firstName,
@@ -71,7 +98,7 @@ class PaymentController{
             const studentId = req.body.id;
             await PaymentModel.update(data, { where: { id: studentId } });
 
-            res.json({ message: 'Student_model updated successfully' });
+            res.json({ message: 'User_model updated successfully' });
         } catch (err: any) {
             res.status(500).json(err)
         }
@@ -81,11 +108,11 @@ class PaymentController{
         try {
             const paymentId = req.params.id;
             await PaymentModel.destroy({ where: { id: paymentId } });
-            res.json({ message: 'Student_model deleted successfully' });
+            res.json({ message: 'User_model deleted successfully' });
         } catch (err: any) {
             res.status(500).json(err)
         }
     }
 }
 
-export default new PaymentController ()
+export default  new PaymentController()

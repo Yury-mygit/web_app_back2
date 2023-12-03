@@ -1,13 +1,17 @@
 import { Table, Column, Model, DataType, CreatedAt, UpdatedAt, AutoIncrement, PrimaryKey, AllowNull, Unique, Default } from 'sequelize-typescript';
 import {sequelize} from "../database/database";
-import Student_model from "./student_model";
+import User_model from "./user/user_model";
 
+export interface OfficeAttributes {
+    office_id:number;
+    address: string;
+}
 @Table({tableName:'office'})
 class Office_model extends Model {
     @AutoIncrement
     @PrimaryKey
     @Column
-    id!: number;
+    office_id!: number;
 
     @AllowNull(false)
     @Column

@@ -1,15 +1,20 @@
-import Student_model from "../models/student_model";
+import User_model from "../models/user/user_model";
+import UserAttributes from "../interface/user_interface";
 
-class Student_controller {
+type PartialUserAttributes = Pick<UserAttributes, 'user_id' | 'name' | 'surname'>;
+class UserController {
     async getAllStudents(req:any, res:any, next:any){
         try {
             const skip = parseInt(req.query.skip as string) || 0;
             const limit = parseInt(req.query.limit as string) || 100;
 
-            const students = await Student_model.findAll({
+            const fields: (keyof PartialUserAttributes)[] = ['user_id', 'name', 'surname'];
+
+            const students = await User_model.findAll({
                 offset: skip,
                 limit: limit,
-                order:['id']
+                order:['user_id'],
+                attributes: fields
             });
 
             res.json(students);
@@ -39,7 +44,7 @@ class Student_controller {
 
         try {
             const studentData = req.body;
-            const student = await Student_model.create(tempdata);
+            const student = await User_model.create(tempdata);
             res.json(student.id);
         } catch (err: any) {
             res.status(500).json(err)
@@ -64,8 +69,8 @@ class Student_controller {
 
         try {
             const studentId = req.body.id;
-            await Student_model.update(tempdata, { where: { id: studentId } });
-            res.json({ message: 'Student_model updated successfully' });
+            await User_model.update(tempdata, { where: { id: studentId } });
+            res.json({ message: 'User_model updated successfully' });
         } catch (err: any) {
             res.status(500).json(err)
         }
@@ -74,12 +79,12 @@ class Student_controller {
     async deleteStudent(req:any, res:any, next:any){
         try {
             const studentId = req.params.id;
-            await Student_model.destroy({ where: { id: studentId } });
-            res.json({ message: 'Student_model deleted successfully' });
+            await User_model.destroy({ where: { id: studentId } });
+            res.json({ message: 'User_model deleted successfully' });
         } catch (err: any) {
             res.status(500).json(err)
         }
     }
 }
 
-export default new Student_controller();
+export default new UserController();

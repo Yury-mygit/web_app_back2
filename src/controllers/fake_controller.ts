@@ -2,18 +2,31 @@
 Controller that fill db with fake data. Pay attention! Db will drop and fill with new fake data
 */
 
-import Student_model from "../models/student_model";
-import Session_model, {I_Session, ServiceType, Status} from "../models/session_model";
-import Office_model from "../models/office_model";
-import Employee_model from "../models/employee_model";
-import {faker, tr} from "@faker-js/faker";
+import User_model from "../models/user/user_model";
+import UserAttributes, {UserCreationAttributes, UserStatus} from "../interface/user_interface"
+import Session_model, {ServiceType, Status} from "../models/session_model";
+import Office_model, {OfficeAttributes} from "../models/office_model";
+import Employee_model, {StaffAttributes} from "../models/employee_model";
+import {faker} from "@faker-js/faker";
 import {Op} from 'sequelize';
-import {l} from '../servises/serv'
+
+interface Isession {
+    index: number;
+    student_id: number;
+    employee_id: number;
+    student_name: string;
+    office_id: number;
+    day:number;
+    time:number;
+}
+
 class FakeData_Controller {
 
     private property1: string;
     private property2: number;
     private dateOfInitialDiagnosis: Date;
+
+
 
     constructor(property1: string = '', property2: number = 0) {
         this.property1 = property1;
@@ -29,7 +42,7 @@ class FakeData_Controller {
         this.property2 = req.body.property2;
 
         try {
-            await Student_model.sync({force: true})
+            await User_model.sync({force: true})
             await Employee_model.sync({force: true})
             await Office_model.sync({force:true})
             await Session_model.sync({force:true})
@@ -41,23 +54,24 @@ class FakeData_Controller {
 
     studentfill = async ( number: number) => {
 
-        const data = {
-            firstName: faker.person.firstName(),
-            lastName: faker.person.lastName(),
-            parentsName: faker.person.firstName(),
+        const data :UserCreationAttributes = {
+            name: faker.person.firstName(),
+            surname: faker.person.lastName(),
+            parents: faker.person.firstName(),
             age: faker.number.int({min: 3, max: 50}),
-            status: 'active',
-            sessionTransferRate: 0.05,
-            percentageOfAbsences: 0.02,
-            contactEmail: faker.internet.email(),
-            contactTelephone: faker.phone.number(),
-            dateOfInitialDiagnosis: this.dateOfInitialDiagnosis.toISOString(),
+            status: UserStatus.ACTIVE,
+            attendance: 0.05,
+            absences: 0.02,
+            email: faker.internet.email(),
+            telephone: faker.phone.number(),
+            issue:'Постановка звука Р',
+            initial_diagnosis_date: this.dateOfInitialDiagnosis.toISOString(),
             address: faker.location.streetAddress()
         }
 
         try {
             for(let i = 0; i < number; i++) {
-                await Student_model.create(data);
+                await User_model.create(data);
             }
             return true;
         } catch (err) {
@@ -121,7 +135,7 @@ class FakeData_Controller {
             startDate = startDate || twoWeeksAgo;
             endDate = endDate || new Date();
 
-            const students_local = await Student_model.findAll({
+            const students_local:UserAttributes[] = await User_model.findAll({
                 where: {
                     createdAt: {
                         [Op.gte]: startDate,
@@ -153,10 +167,11 @@ class FakeData_Controller {
             }
 
             const sessions: Isession[] = [];
+
             let uniqueIndex = 0;
             const uniqueTimes = new Set();
 
-            students_local.forEach((item) => {
+            students_local.forEach((stud_loc) => {
                 const session_number: number = this.getRandomElement([1, 2, 3]) || 1;
 
                 for (let i = 0; i < session_number; i++) {
@@ -188,9 +203,9 @@ class FakeData_Controller {
 
                     sessions.push({
                         'index': uniqueIndex,
-                        'student_id': item.id,
+                        'student_id': stud_loc.user_id,
                         'employee_id': randomEmployee.id, // Now it's guaranteed not to be undefined
-                        'student_name': item.firstName,
+                        'student_name': stud_loc.name,
                         'office_id':randomOffice.id,
                         'day':randomDay,
                         'time': randomHour,
@@ -209,31 +224,29 @@ class FakeData_Controller {
 
 
                 date.setUTCHours(session.time-3, 0, 0, 0); // The minutes, seconds, and milliseconds are set to 0 // Set the hour
+                console.log(date)
 
 
-                const moscowTime = date.toLocaleString('en-US', { timeZone: 'Europe/Moscow' });; // Get the time in the Moscow time zone
-
-                console.log(moscowTime)
-
-                const ses: Partial<I_Session>  = {
-                    startDateTime: moscowTime,
-                    duration: 40,
-                    week_first_day: '<placeholder>',
-                    online: true,
-                    paid: true,
-                    confirmed: true,
-                    student_id: session.student_id,
-                    employee_id: session.employee_id,
-                    repeatable: true,
-                    notes: '<placeholder>',
-                    office_id: session.office_id,
-                    performed: true,
-                    serviceType: ServiceType.log,
-                    status: Status.active,
-                    payment_id: 1,
+                for (let i = -2; i < 2; i++) { // выведет 0, затем 1, затем 2
+                    const finalDate = new Date(date.getTime() + i * 7 * 24 * 60 * 60 * 1000)
+                    await Session_model.create({
+                        startDateTime: finalDate.toISOString(),
+                        duration: 40,
+                        week_first_day: '<placeholder>',
+                        online: true,
+                        paid: true,
+                        confirmed: true,
+                        student_id: session.student_id,
+                        employee_id: session.employee_id,
+                        repeatable: true,
+                        notes: '<placeholder>',
+                        office_id: session.office_id,
+                        performed: true,
+                        serviceType: ServiceType.log,
+                        status: Status.active,
+                        payment_id: 1,
+                    }   );
                 }
-                // console.log(typeof (ses.startDateTime));
-                await Session_model.create(ses);
             }
 
 
@@ -252,6 +265,65 @@ class FakeData_Controller {
             }
         }
     }
+
+    makeSessionFromStudent = (
+        students:UserAttributes[],
+        staff:StaffAttributes[],
+        offices:OfficeAttributes[]
+    ):Isession[] => {
+
+        const sessions_:Isession[] = []
+
+        let uniqueIndex = 0;
+        const uniqueTimes = new Set();
+
+        students.forEach((item:any) => {
+            const session_number: number = this.getRandomElement([1, 2, 3]) || 1;
+
+            for (let i = 0; i < session_number; i++) {
+                const randomEmployee = this.getRandomElement(staff);
+
+                let randomDay;
+                let randomHour;
+                let timeString;
+
+                do {
+                    randomDay = this.getRandomElement2([0,1,2,3,4,5,6]);
+                    randomHour = this.getRandomElement2([9,10,11,12,13,14,15,16,17,18,18,20]);
+
+                    // Create a string that represents the day and hour
+                    console.log(`${randomDay}-${randomHour}`)
+                    timeString = `${randomDay}-${randomHour}`;
+                } while (uniqueTimes.has(timeString));
+
+
+
+
+                if (!randomEmployee) {
+                    throw new Error('No employee found');
+                }
+                const randomOffice = this.getRandomElement(offices);
+                if (!randomOffice) {
+                    throw new Error('No employee found');
+                }
+
+                sessions_.push({
+                    'index': uniqueIndex,
+                    'student_id': item.id,
+                    'employee_id': randomEmployee.staff_id, // Now it's guaranteed not to be undefined
+                    'student_name': item.firstName,
+                    'office_id':randomOffice.office_id,
+                    'day':randomDay,
+                    'time': randomHour,
+                });
+                uniqueIndex++;
+            }
+        });
+
+        return sessions_
+    }
+
+
 
 
     getRandomElement = <T>(array: T[]): T | undefined =>{

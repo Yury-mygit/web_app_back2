@@ -105,7 +105,7 @@ class SessionController {
             const [rowsUpdated, [updatedStudentData]] = await SessionModel.update(upd_Session, { where: { id: sesssionId }, returning: true });
 
             if (rowsUpdated > 0) {
-                res.json({ message: 'Student_model updated successfully', updatedStudent: updatedStudentData });
+                res.json({ message: 'User_model updated successfully', updatedStudent: updatedStudentData });
             } else {
                 res.status(404).json({ message: 'Student not found' });
             }
@@ -119,7 +119,7 @@ class SessionController {
         try {
             const studentId = req.params.id;
             await SessionModel.destroy({ where: { id: studentId } });
-            res.json({ message: 'Student_model deleted successfully' });
+            res.json({ message: 'User_model deleted successfully' });
         } catch (err: any) {
             res.status(500).json(err)
         }

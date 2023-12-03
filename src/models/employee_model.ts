@@ -1,20 +1,39 @@
 import { Model, Column, Table, AutoIncrement, PrimaryKey, AllowNull, DataType } from 'sequelize-typescript';
 import {sequelize} from "../database/database";
+import {Optional} from "sequelize";
 
-enum Status {
-    'active' =0,
+export enum StaffStatus {
+    'active' = 0,
 }
+
+
+export interface StaffAttributes {
+    staff_id: number;
+    status: StaffStatus;
+    position: string;
+    profession: string;
+    first_name: string;
+    last_name: string;
+    contact_email: string;
+    contact_telephone: string;
+    telegram_id: number;
+    online: boolean;
+    offline: boolean;
+    qualifications?: string;
+    experience_years?: number;
+}
+export interface StaffCreationAttributes extends Optional<StaffAttributes, 'staff_id'>{}
 
 @Table({ tableName: 'employee' })
 class Employee_model extends Model {
     @AutoIncrement
     @PrimaryKey
     @Column
-    id!: number;
+    staff_id!: number;
 
     @AllowNull(false)
-    @Column(DataType.ENUM(...Object.keys(Status)))
-    status!: Status;
+    @Column(DataType.ENUM(...Object.keys(StaffStatus)))
+    status!: StaffStatus;
 
     @AllowNull(false)
     @Column
