@@ -1,14 +1,9 @@
 import express from 'express';
 import controller from '../../controllers/payment_controller'
 import { validationResult, body, query, checkSchema,  check, oneOf  } from 'express-validator';
+import {SubscriptionType} from "../../models/payment_model";
 
 export const paymentsRouter = express.Router();
-
-export enum SubscriptionType {
-    ONE_LESSON = 1,
-    FOUR_LESSONS = 4,
-    EIGHT_LESSONS = 8
-}
 
 // Middleware for error checking
 const validate = () => {
@@ -34,7 +29,7 @@ const validate = () => {
             next();
         },
         (req: any, res: any, next: any) => {
-            console.log(req.body)
+            // console.log(req.body)
             next();
         }
     ];
@@ -44,7 +39,9 @@ const validateCreate = () => {
         body('user_id').exists().withMessage('id is required'),
         body('user_id').isNumeric().toInt().withMessage('id must be a number'),
         body('pay_type').exists().withMessage('pay_type is required'),
-        body('pay_type').custom((value) => Object.values(SubscriptionType).includes(value)).withMessage('Invalid pay_type'),
+        // body('pay_type').custom((value) => Object.values(SubscriptionType).includes(value)).withMessage('Invalid pay_type'),
+        body('pay_type').custom((value) => Object.values(SubscriptionType).includes(Number(value))).withMessage('Invalid pay_type'),
+
         (req: any, res: any, next: any) => {
             const errors = validationResult(req);
             if (!errors.isEmpty()) {
@@ -92,6 +89,7 @@ paymentsRouter.post('/get_all', ...validate(), controller.getAllPays);
  *                 user_id:
  *                   type: integer
  *                   description: The ID of the student to update
+ *                   default: 1
  *                 skip:
  *                   type: integer
  *                   description: skip

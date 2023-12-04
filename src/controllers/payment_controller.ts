@@ -1,9 +1,7 @@
 /* read me
 *  Payment Controller
 */
-import PaymentModel  from '../models/payment_model'
-import {  validationResult, checkSchema,  check, oneOf ,  body, query } from 'express-validator';
-import {ServiceType, Status} from "../models/session_model";
+import PaymentModel, {PayAttributes, PayCreationAttributes, PaymentStatus} from '../models/payment_model'
 
 // type PartialUserAttributes = Pick<UserAttributes, 'user_id' | 'name' | 'surname'>;
 
@@ -11,17 +9,16 @@ class PaymentController{
     async getAllPays(req:any, res:any, next:any){
 
         const payload = req.body
+        const skip = payload.skip || 0;
+        const limit = payload.limit || 100;
 
         try {
-            const skip = parseInt(req.query.skip as string) || 0;
-            const limit = parseInt(req.query.limit as string) || 100;
-
-            const students = await PaymentModel.findAll({
+            const students:PayAttributes[] = await PaymentModel.findAll({
                 offset: skip,
                 limit: limit,
-                order:['pay_id']
+                order:['pay_id'],
+                attributes: ['pay_id', 'user_id', 'status']
             });
-
             res.json(students);
         } catch (err) {
             if (err instanceof Error) {
@@ -34,22 +31,13 @@ class PaymentController{
 
     async createPay(req:any, res:any, next:any){
 
-        const data = {
-            firstName: req.body.firstName,
-            lastName: req.body.lastName,
-            parentsName: req.body.firstName,
-            age: req.body.age,
-            status: 'active',
-            sessionTransferRate: 0.05,
-            percentageOfAbsences: 0.02,
-            contactEmail: req.body.contactEmail,
-            contactTelephone: req.body.contactTelephone,
-            dateOfInitialDiagnosis: req.body.dateOfInitialDiagnosis,
-            address: req.body.address
+        const data: PayCreationAttributes = {
+            user_id: req.body.user_id,
+            pay_type: req.body.pay_type,
+            status: PaymentStatus.NEW
         }
 
         try {
-            const studentData = req.body;
             const payment = await PaymentModel.create( data);
             res.json(payment.id);
         } catch (err: any) {

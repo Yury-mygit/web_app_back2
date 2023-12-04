@@ -25,13 +25,13 @@ export enum SubscriptionType {
 }
 
 export interface PayAttributes{
-    id: number;
-    student_id: number;
+    pay_id: number;
+    user_id: number;
     status: PaymentStatus;
     pay_type: SubscriptionType
 }
 
-export interface PayCreationAttributes extends Optional<PayAttributes, 'id'> {}
+export interface PayCreationAttributes extends Optional<PayAttributes, 'pay_id'> {}
 
 @Table({ tableName: 'payment' })
 class PaymentModel extends Model {
@@ -51,11 +51,11 @@ class PaymentModel extends Model {
     @AllowNull(false)
     @Column
     get pay_type(): SubscriptionType {
-        return this.getDataValue('subscription_type');
+        return this.getDataValue('pay_type');
     }
 
-    set subscription_type(value: SubscriptionType) {
-        this.setDataValue('subscription_type', value);
+    set pay_type(value: SubscriptionType) {
+        this.setDataValue('pay_type', value);
     }
 
 }
