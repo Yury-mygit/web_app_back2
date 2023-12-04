@@ -5,31 +5,10 @@ import PaymentModel  from '../models/payment_model'
 import {  validationResult, checkSchema,  check, oneOf ,  body, query } from 'express-validator';
 import {ServiceType, Status} from "../models/session_model";
 
+// type PartialUserAttributes = Pick<UserAttributes, 'user_id' | 'name' | 'surname'>;
+
 class PaymentController{
     async getAllPays(req:any, res:any, next:any){
-
-        // return res.status(400).json({ errors: 'sdsadd' });
-        //
-        // Define validation rules
-        console.log(req.body)
-        // const validationRules = [
-        //     body('user_id').isNumeric().toInt().optional(),
-        //     query('user_id').isNumeric().toInt().optional(),
-        //     body('skip').isNumeric().toInt().optional(),
-        //     query('skip').isNumeric().toInt().optional(),
-        //     body('limit').isNumeric().toInt().optional(),
-        //     query('limit').isNumeric().toInt().optional()
-        // ];
-        //
-        // // Validate the request
-        // await Promise.all(validationRules.map(rule => rule.run(req)));
-
-        // Check for validation errors
-        const errors = validationResult(req);
-        console.log(errors)
-        if (!errors.isEmpty()) {
-            return res.status(400).json({ errors: errors.array() });
-        }
 
         const payload = req.body
 
@@ -53,7 +32,7 @@ class PaymentController{
         }
     }
 
-    async AcceptPayment(req:any, res:any, next:any){
+    async createPay(req:any, res:any, next:any){
 
         const data = {
             firstName: req.body.firstName,

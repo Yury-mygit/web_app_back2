@@ -46,7 +46,28 @@ const swaggerOptions = {
 };
 const swaggerDocs = swaggerJsDoc(swaggerOptions);
 
+interface SyntaxErrorWithStatus extends SyntaxError {
+    status?: number;
+}
+
 app.use(express.json())
+
+
+app.use((req: express.Request, res: express.Response, next: express.NextFunction) => {
+    // console.log(req.body); // This will be logged for every request
+
+    next();
+});
+app.use((err: SyntaxErrorWithStatus, req: express.Request, res: express.Response, next: express.NextFunction) => {
+    console.log(err); // Log all errors
+
+    if (err.status === 400 && 'body' in err) {
+        return res.status(400).send({ message: "Invalid JSON", error: err.message }); // Include error message
+    }
+
+    next();
+});
+
 app.use(cookieParser())
 app.use(cors({
     origin: ['http://localhost:3002','http://localhost:3000']
