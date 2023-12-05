@@ -1,0 +1,11 @@
+/* custom-swagger-ui.css */
+.swagger-ui {
+    background-color: #333;
+    color: #fff;
+}
+
+.swagger-ui .topbar {
+    background-color: #222;
+}
+
+/* Additional custom styles... */

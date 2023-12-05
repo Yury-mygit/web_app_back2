@@ -4,28 +4,29 @@ Controller that fill db with fake data. Pay attention! Db will drop and fill wit
 
 import User_model from "../models/user/user_model";
 import UserAttributes, {UserCreationAttributes, UserStatus} from "../interface/user_interface"
+import SessionAttributes from "../interface/session_interfases";
 import Session_model, {ServiceType, Status} from "../models/session_model";
 import Office_model, {OfficeAttributes} from "../models/office_model";
 import Employee_model, {StaffAttributes} from "../models/employee_model";
 import {faker} from "@faker-js/faker";
 import {Op} from 'sequelize';
 
-interface Isession {
-    index: number;
-    student_id: number;
-    employee_id: number;
-    student_name: string;
-    office_id: number;
-    day:number;
-    time:number;
-}
+import PayHandler from '../database/handlers/PaymentDataHandler'
+
+const payHandler = new PayHandler
+
+type CustomSessionAttributes = Partial<SessionAttributes> & {
+    student_name?:string;
+    index?:number;
+    day: number;
+    time: number;
+};
 
 class FakeData_Controller {
 
     private property1: string;
     private property2: number;
     private dateOfInitialDiagnosis: Date;
-
 
 
     constructor(property1: string = '', property2: number = 0) {
@@ -156,17 +157,20 @@ class FakeData_Controller {
                 throw new Error('offices_local is undefined or empty');
             }
 
-            interface Isession {
-                index: number;
-                student_id: number;
-                employee_id: number;
-                student_name: string;
-                office_id: number;
-                day:number;
-                time:number;
-            }
 
-            const sessions: Isession[] = [];
+
+
+
+
+
+
+            // const sessions: Isession[] = [];
+            const sessions: CustomSessionAttributes[] = [];
+
+
+
+
+
 
             let uniqueIndex = 0;
             const uniqueTimes = new Set();
@@ -250,7 +254,7 @@ class FakeData_Controller {
             }
 
 
-
+            console.log(await payHandler.read_all_by_user('2'))
 
             // console.log('sessions = ', sessions);
 
@@ -266,63 +270,63 @@ class FakeData_Controller {
         }
     }
 
-    makeSessionFromStudent = (
-        students:UserAttributes[],
-        staff:StaffAttributes[],
-        offices:OfficeAttributes[]
-    ):Isession[] => {
-
-        const sessions_:Isession[] = []
-
-        let uniqueIndex = 0;
-        const uniqueTimes = new Set();
-
-        students.forEach((item:any) => {
-            const session_number: number = this.getRandomElement([1, 2, 3]) || 1;
-
-            for (let i = 0; i < session_number; i++) {
-                const randomEmployee = this.getRandomElement(staff);
-
-                let randomDay;
-                let randomHour;
-                let timeString;
-
-                do {
-                    randomDay = this.getRandomElement2([0,1,2,3,4,5,6]);
-                    randomHour = this.getRandomElement2([9,10,11,12,13,14,15,16,17,18,18,20]);
-
-                    // Create a string that represents the day and hour
-                    console.log(`${randomDay}-${randomHour}`)
-                    timeString = `${randomDay}-${randomHour}`;
-                } while (uniqueTimes.has(timeString));
-
-
-
-
-                if (!randomEmployee) {
-                    throw new Error('No employee found');
-                }
-                const randomOffice = this.getRandomElement(offices);
-                if (!randomOffice) {
-                    throw new Error('No employee found');
-                }
-
-                sessions_.push({
-                    'index': uniqueIndex,
-                    'student_id': item.id,
-                    'employee_id': randomEmployee.staff_id, // Now it's guaranteed not to be undefined
-                    'student_name': item.firstName,
-                    'office_id':randomOffice.office_id,
-                    'day':randomDay,
-                    'time': randomHour,
-                });
-                uniqueIndex++;
-            }
-        });
-
-        return sessions_
-    }
-
+    // makeSessionFromStudent = (
+    //     students:UserAttributes[],
+    //     staff:StaffAttributes[],
+    //     offices:OfficeAttributes[]
+    // ):CustomSessionAttributes[] => {
+    //
+    //     const sessions_:CustomSessionAttributes[] = []
+    //
+    //     let uniqueIndex = 0;
+    //     const uniqueTimes = new Set();
+    //
+    //     students.forEach((item:any) => {
+    //         const session_number: number = this.getRandomElement([1, 2, 3]) || 1;
+    //
+    //         for (let i = 0; i < session_number; i++) {
+    //             const randomEmployee = this.getRandomElement(staff);
+    //
+    //             let randomDay;
+    //             let randomHour;
+    //             let timeString;
+    //
+    //             do {
+    //                 randomDay = this.getRandomElement2([0,1,2,3,4,5,6]);
+    //                 randomHour = this.getRandomElement2([9,10,11,12,13,14,15,16,17,18,18,20]);
+    //
+    //                 // Create a string that represents the day and hour
+    //                 console.log(`${randomDay}-${randomHour}`)
+    //                 timeString = `${randomDay}-${randomHour}`;
+    //             } while (uniqueTimes.has(timeString));
+    //
+    //
+    //
+    //
+    //             if (!randomEmployee) {
+    //                 throw new Error('No employee found');
+    //             }
+    //             const randomOffice = this.getRandomElement(offices);
+    //             if (!randomOffice) {
+    //                 throw new Error('No employee found');
+    //             }
+    //
+    //             sessions_.push({
+    //                 'index': uniqueIndex,
+    //                 'student_id': item.id,
+    //                 'employee_id': randomEmployee.staff_id, // Now it's guaranteed not to be undefined
+    //                 'student_name': item.firstName,
+    //                 'office_id':randomOffice.office_id,
+    //                 'day':randomDay,
+    //                 'time': randomHour,
+    //             });
+    //             uniqueIndex++;
+    //         }
+    //     });
+    //
+    //     return sessions_
+    // }
+    //
 
 
 

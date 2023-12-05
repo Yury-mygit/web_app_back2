@@ -6,6 +6,9 @@ import bodyParser from 'body-parser';
 import { sequelize } from './database/database';
 import routes from './routers';
 import 'dotenv/config'
+const path = require('path');
+const fs = require('fs');
+
 
 const cookieParser = require('cookie-parser')
 const app = express();
@@ -75,6 +78,13 @@ app.use(cors({
 app.use(bodyParser.json()); // for parsing application/json
 app.use(bodyParser.urlencoded({ extended: true })); // for parsing application/x-www-form-urlencoded
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocs));
+
+
+//!!!!!!!!!!!
+app.get('/api-docs/swagger-ui.css', (req, res) => {
+    res.sendFile(path.join(__dirname, './swa_static/custom-swagger-ui.css'));
+});
+
 app.use('/', routes);
 
 

@@ -31,4 +31,5 @@ export enum UserStatus {
 
 export default UserAttributes
 
-export interface UserCreationAttributes extends Optional<UserAttributes, 'user_id' | 'updatedAt' | 'createdAt'>{}
+// export interface UserCreationAttributes extends Optional<UserAttributes, 'user_id' | 'updatedAt' | 'createdAt'>{}
+export interface UserCreationAttributes extends Partial<UserAttributes> {}

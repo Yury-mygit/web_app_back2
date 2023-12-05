@@ -4,9 +4,10 @@ import Validator from '../validators/Validator'
 
 export const paymentsRouter = express.Router();
 
-paymentsRouter.post('/createPay', ...Validator.validateCreatePay(), controller.createPay);
 paymentsRouter.post('/get_all', ...Validator.validateGetAllPays(), controller.getAllPays);
-
+paymentsRouter.post('/createPay', ...Validator.validateCreatePay(), controller.createPay);
+paymentsRouter.post('/update', ...Validator.validateCreatePay(), controller.updatePay);
+paymentsRouter.delete("/delete",...Validator.validateDelete(), controller.deletePayment);
 /**
  * @openapi
  * paths:
@@ -43,6 +44,57 @@ paymentsRouter.post('/get_all', ...Validator.validateGetAllPays(), controller.ge
  *         '200':
  *           description: Successful operation
  *
+ *   /payment/update:
+ *     post:
+ *       tags:
+ *           - Payment
+ *       summary: Update a new payment record
+ *       description: Update a new payment record
+ *       requestBody:
+ *         required: true
+ *         content:
+ *           application/json:
+ *             schema:
+ *                type: object
+ *                properties:
+ *                 pay_id:
+ *                   type: integer
+ *                   description: The ID of the student to update
+ *                   default: 1
+ *                 user_id:
+ *                   type: integer
+ *                   description: The ID of the student to update
+ *                   default: 1
+ *                 status:
+ *                   type: string
+ *                   description: type of payments
+ *                   default: active
+ *                 product_type:
+ *                   type: string
+ *                   description: type of payments
+ *                   default: product_a
+ *                required:
+ *                 - pay_id
+ *
+ *       responses:
+ *         '201':
+ *           description: Student added successfully
+ *
+ *     patch:
+ *       tags:
+ *           - Session
+ *       summary: Update a student
+ *       description: Update an existing student's information
+ *       requestBody:
+ *         required: true
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Student'
+ *       responses:
+ *         '200':
+ *           description: Student updated successfully
+ *
  *   /payment/createPay:
  *     post:
  *       tags:
@@ -70,7 +122,7 @@ paymentsRouter.post('/get_all', ...Validator.validateGetAllPays(), controller.ge
  *       responses:
  *         '201':
  *           description: Student added successfully
-
+ *
  *     patch:
  *       tags:
  *           - Session
