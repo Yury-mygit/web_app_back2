@@ -1,74 +1,11 @@
 import express from 'express';
-import controller from '../../controllers/payment_controller'
-import { validationResult, body, query, checkSchema,  check, oneOf  } from 'express-validator';
-import {SubscriptionType} from "../../models/payment_model";
+import controller from '../../controllers/PaymentRouteHandler'
+import Validator from '../validators/Validator'
 
 export const paymentsRouter = express.Router();
 
-// Middleware for error checking
-const validate = () => {
-    return [
-        body('user_id').exists().withMessage('user_id is required'),
-        body('user_id').isNumeric().toInt().withMessage('user_id must be a number'),
-        body('user_id').custom((value:number) => value > 0 && value < 1000).withMessage('user_id must be greater than 0 and less than 1000'),
-        body('skip').optional({ nullable: true, checkFalsy: true }).isNumeric().toInt().withMessage('skip must be a number'),
-        body('limit').optional({ nullable: true, checkFalsy: true }).isNumeric().toInt().withMessage('limit must be a number'),
-        (req: any, res: any, next: any) => {
-            const errors = validationResult(req);
-            if (!errors.isEmpty()) {
-                return res.status(400).json({ errors: errors.array() });
-            }
-            next();
-        },
-        (req: any, res: any, next: any) => {
-            const validProperties = ['user_id', 'skip', 'limit'];
-            const extraProperties = Object.keys(req.body).filter(prop => !validProperties.includes(prop));
-            if (extraProperties.length) {
-                return res.status(400).json({ errors: `Invalid properties in request: ${extraProperties.join(', ')}` });
-            }
-            next();
-        },
-        (req: any, res: any, next: any) => {
-            // console.log(req.body)
-            next();
-        }
-    ];
-};
-const validateCreate = () => {
-    return [
-        body('user_id').exists().withMessage('id is required'),
-        body('user_id').isNumeric().toInt().withMessage('id must be a number'),
-        body('pay_type').exists().withMessage('pay_type is required'),
-        // body('pay_type').custom((value) => Object.values(SubscriptionType).includes(value)).withMessage('Invalid pay_type'),
-        body('pay_type').custom((value) => Object.values(SubscriptionType).includes(Number(value))).withMessage('Invalid pay_type'),
-
-        (req: any, res: any, next: any) => {
-            const errors = validationResult(req);
-            if (!errors.isEmpty()) {
-                return res.status(400).json({ errors: errors.array() });
-            }
-            next();
-        },
-        (req: any, res: any, next: any) => {
-            const errors = validationResult(req);
-            if (!errors.isEmpty()) {
-                return res.status(400).json({ errors: errors.array() });
-            }
-            next();
-        },
-        (req: any, res: any, next: any) => {
-            const validProperties = ['user_id', 'pay_type'];
-            const extraProperties = Object.keys(req.body).filter(prop => !validProperties.includes(prop));
-            if (extraProperties.length) {
-                return res.status(400).json({ errors: `Extra field(s) in the request: ${extraProperties.join(', ')}` });
-            }
-            next();
-        }
-    ];
-};
-
-paymentsRouter.post('/createPay', ...validateCreate(), controller.createPay);
-paymentsRouter.post('/get_all', ...validate(), controller.getAllPays);
+paymentsRouter.post('/createPay', ...Validator.validateCreatePay(), controller.createPay);
+paymentsRouter.post('/get_all', ...Validator.validateGetAllPays(), controller.getAllPays);
 
 /**
  * @openapi
@@ -123,13 +60,13 @@ paymentsRouter.post('/get_all', ...validate(), controller.getAllPays);
  *                   type: integer
  *                   description: The ID of the student to update
  *                   default: 1
- *                 pay_type:
+ *                 product_type:
  *                   type: string
  *                   description: type of payments
- *                   default: ONE_LESSON
+ *                   default: product_a
  *                required:
  *                 - user_id
- *                 - pay_type
+ *                 - product_type
  *       responses:
  *         '201':
  *           description: Student added successfully

@@ -18,19 +18,18 @@ export enum PaymentStatus {
     SPENT = "spent"
 }
 
-export enum SubscriptionType {
-    ONE_LESSON = 1,
-    FOUR_LESSONS = 4,
-    EIGHT_LESSONS = 8
+export enum ProductType {
+    PRODUCT_A = "product_a",
+    PRODUCT_B = "product_b",
+    PRODUCT_C = "product_c"
 }
 
 export interface PayAttributes{
     pay_id: number;
     user_id: number;
     status: PaymentStatus;
-    pay_type: SubscriptionType
+    product_type: ProductType
 }
-
 export interface PayCreationAttributes extends Optional<PayAttributes, 'pay_id'> {}
 
 @Table({ tableName: 'payment' })
@@ -49,13 +48,13 @@ class PaymentModel extends Model {
     status!: PaymentStatus;
 
     @AllowNull(false)
-    @Column
-    get pay_type(): SubscriptionType {
-        return this.getDataValue('pay_type');
+    @Column(DataType.STRING)
+    get product_type(): ProductType {
+        return this.getDataValue('product_type');
     }
 
-    set pay_type(value: SubscriptionType) {
-        this.setDataValue('pay_type', value);
+    set product_type(value: ProductType) {
+        this.setDataValue('product_type', value);
     }
 
 }

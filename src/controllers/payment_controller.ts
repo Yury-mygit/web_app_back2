@@ -1,11 +1,14 @@
 /* read me
 *  Payment Controller
 */
-import PaymentModel, {PayAttributes, PayCreationAttributes, PaymentStatus} from '../models/payment_model'
+import PaymentModel, {PayAttributes, PayCreationAttributes, PaymentStatus, ProductType} from '../models/payment_model'
 
 // type PartialUserAttributes = Pick<UserAttributes, 'user_id' | 'name' | 'surname'>;
 
 class PaymentController{
+    constructor() {
+        this.createPay = this.createPay.bind(this);
+    }
     async getAllPays(req:any, res:any, next:any){
 
         const payload = req.body
@@ -28,23 +31,23 @@ class PaymentController{
             }
         }
     }
-
     async createPay(req:any, res:any, next:any){
 
-        const data: PayCreationAttributes = {
+        const payload: PayCreationAttributes = {
             user_id: req.body.user_id,
-            pay_type: req.body.pay_type,
+            product_type: req.body.product_type,
             status: PaymentStatus.NEW
         }
 
+        let data
+
         try {
-            const payment = await PaymentModel.create( data);
-            res.json(payment.id);
-        } catch (err: any) {
+            data = await this.make_record(payload)
+            res.json(data)
+        } catch (err) {
             res.status(500).json(err)
         }
     }
-
     async updatePayment(req:any, res:any, next:any){
 
         const data = {
@@ -70,7 +73,6 @@ class PaymentController{
             res.status(500).json(err)
         }
     }
-
     async deletePayment(req:any, res:any, next:any){
         try {
             const paymentId = req.params.id;
@@ -79,6 +81,75 @@ class PaymentController{
         } catch (err: any) {
             res.status(500).json(err)
         }
+    }
+
+    async make_record(data: PayCreationAttributes): Promise<Partial<PayAttributes>> {
+        const createdRecord = await PaymentModel.create(data);
+
+        // Fetch the created record with filtered fields
+        const fetchedRecord = await PaymentModel.findOne({
+            where: { pay_id: createdRecord.pay_id },
+            attributes: ['pay_id', 'user_id', 'product_type', 'status']  // Specify the fields you want to include
+        });
+
+        if (!fetchedRecord) {
+            throw new Error('Record not found after creation');
+        }
+
+        return fetchedRecord;
+    }
+    async update_record(data: Partial<PayAttributes>): Promise<Partial<PayAttributes>> {
+        // Extract pay_id from data
+        const { pay_id, ...updateData } = data;
+
+        // Update the record
+        await PaymentModel.update(updateData, {
+            where: { pay_id }
+        });
+
+        // Fetch the updated record with filtered fields
+        const fetchedRecord = await PaymentModel.findOne({
+            where: { pay_id },
+            attributes: ['pay_id', 'user_id', 'product_type', 'status']  // Specify the fields you want to include
+        });
+
+        if (!fetchedRecord) {
+            throw new Error('Record not found after update');
+        }
+
+        return fetchedRecord;
+    }
+    async read_all(): Promise<Partial<PayAttributes>[]> {
+        const records = await PaymentModel.findAll({
+            attributes: ['pay_id', 'user_id', 'product_type', 'status']  // Specify the fields you want to include
+        });
+
+        return records;
+    }
+    async read_all_by_user(user_id: string): Promise<Partial<PayAttributes>[]> {
+        const records = await PaymentModel.findAll({
+            where: { user_id },
+            attributes: ['pay_id', 'user_id', 'product_type', 'status']  // Specify the fields you want to include
+        });
+
+        return records;
+    }
+    async read_by_pay_id(pay_id: string): Promise<Partial<PayAttributes>> {
+        const record = await PaymentModel.findOne({
+            where: { pay_id },
+            attributes: ['pay_id', 'user_id', 'product_type', 'status']  // Specify the fields you want to include
+        });
+
+        if (!record) {
+            throw new Error('Record not found');
+        }
+
+        return record;
+    }
+    async delete_by_pay_id(pay_id: string): Promise<void> {
+        await PaymentModel.destroy({
+            where: { pay_id }
+        });
     }
 }
 
