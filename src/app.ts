@@ -55,7 +55,7 @@ interface SyntaxErrorWithStatus extends SyntaxError {
 
 app.use(express.json())
 
-
+app.use(express.static(path.join(__dirname, './build/')));
 app.use((req: express.Request, res: express.Response, next: express.NextFunction) => {
     // console.log(req.body); // This will be logged for every request
 
@@ -73,7 +73,7 @@ app.use((err: SyntaxErrorWithStatus, req: express.Request, res: express.Response
 
 app.use(cookieParser())
 app.use(cors({
-    origin: ['http://localhost:3002','http://localhost:3000']
+    origin: ['http://localhost:3002','http://localhost:3000','https://ebbc-176-115-195-132.ngrok-free.app/']
 }));
 app.use(bodyParser.json()); // for parsing application/json
 app.use(bodyParser.urlencoded({ extended: true })); // for parsing application/x-www-form-urlencoded
@@ -83,6 +83,10 @@ app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocs));
 //!!!!!!!!!!!
 app.get('/api-docs/swagger-ui.css', (req, res) => {
     res.sendFile(path.join(__dirname, './swa_static/custom-swagger-ui.css'));
+});
+
+app.get('/home', (req, res) => {
+    res.sendFile(path.join(__dirname, './build/', 'index.html'));
 });
 
 app.use('/', routes);

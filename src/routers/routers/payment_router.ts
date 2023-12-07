@@ -1,17 +1,19 @@
 import express from 'express';
-import controller from '../../controllers/PaymentRouteHandler'
+import controller from '../../controllers/Payment_Contriller'
 import Validator from '../validators/Validator'
 
 export const paymentsRouter = express.Router();
 
-paymentsRouter.post('/get_all', ...Validator.validateGetAllPays(), controller.getAllPays);
-paymentsRouter.post('/createPay', ...Validator.validateCreatePay(), controller.createPay);
-paymentsRouter.post('/update', ...Validator.validateCreatePay(), controller.updatePay);
-paymentsRouter.delete("/delete",...Validator.validateDelete(), controller.deletePayment);
+paymentsRouter.post('/getall', ...Validator.validateGetAllPays(), controller.getAllPays_v2);
+paymentsRouter.post('/create', ...Validator.validateCreatePay(), controller.createPay_v2);
+paymentsRouter.patch('/update', ...Validator.validateUpdatePay(), controller.updatePay_v2);
+paymentsRouter.delete("/delete",...Validator.validateDelete(), controller.deletePayment_v2);
+
+
 /**
  * @openapi
  * paths:
- *   /payment/get_all:
+ *   /payment/getall:
  *     post:
  *       tags:
  *         - Payment
@@ -45,7 +47,7 @@ paymentsRouter.delete("/delete",...Validator.validateDelete(), controller.delete
  *           description: Successful operation
  *
  *   /payment/update:
- *     post:
+ *     patch:
  *       tags:
  *           - Payment
  *       summary: Update a new payment record
@@ -80,22 +82,7 @@ paymentsRouter.delete("/delete",...Validator.validateDelete(), controller.delete
  *         '201':
  *           description: Student added successfully
  *
- *     patch:
- *       tags:
- *           - Session
- *       summary: Update a student
- *       description: Update an existing student's information
- *       requestBody:
- *         required: true
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/components/schemas/Student'
- *       responses:
- *         '200':
- *           description: Student updated successfully
- *
- *   /payment/createPay:
+ *   /payment/create:
  *     post:
  *       tags:
  *           - Payment
@@ -123,17 +110,37 @@ paymentsRouter.delete("/delete",...Validator.validateDelete(), controller.delete
  *         '201':
  *           description: Student added successfully
  *
- *     patch:
+ *   /payment/delete:
+ *     delete:
  *       tags:
- *           - Session
- *       summary: Update a student
- *       description: Update an existing student's information
+ *           - Payment
+ *       summary: Delete a payment
+ *       description:  Delete a payment
  *       requestBody:
  *         required: true
  *         content:
  *           application/json:
  *             schema:
- *               $ref: '#/components/schemas/Student'
+ *                type: object
+ *                properties:
+ *                 pay_id:
+ *                   type: integer
+ *                   description: The ID of the student to update
+ *                   default: 1
+ *                 user_id:
+ *                   type: integer
+ *                   description: The ID of the student to update
+ *                   default: 1
+ *                 status:
+ *                   type: string
+ *                   description: type of payments
+ *                   default: active
+ *                 product_type:
+ *                   type: string
+ *                   description: type of payments
+ *                   default: product_a
+ *                required:
+ *                 - pay_id
  *       responses:
  *         '200':
  *           description: Student updated successfully

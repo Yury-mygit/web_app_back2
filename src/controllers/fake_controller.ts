@@ -22,19 +22,66 @@ type CustomSessionAttributes = Partial<SessionAttributes> & {
     time: number;
 };
 
+type UserSubset = {
+    user_id: number;
+    name: string;
+    status: UserStatus; // Use the UserStatus type here
+};
+
 class FakeData_Controller {
 
     private property1: string;
     private property2: number;
     private dateOfInitialDiagnosis: Date;
 
+    services: {
+        usersData: (startDate: Date, endDate: Date) => Promise<UserSubset[]>;
+    };
 
     constructor(property1: string = '', property2: number = 0) {
         this.property1 = property1;
         this.property2 = property2;
 
+        this.services = {
+            usersData: this.userDataloader.bind(this)
+        };
+
         this.dateOfInitialDiagnosis = new Date()
         this.dateOfInitialDiagnosis.setDate(this.dateOfInitialDiagnosis.getDate() - 13);
+    }
+
+    private userDataloader = async (startDate: Date, endDate: Date): Promise<UserSubset[]> => {
+        try {
+            const users = await User_model.findAll({
+                attributes: ['user_id', 'name', 'status'], // Select specific attributes
+                where: {
+                    createdAt: {
+                        [Op.gte]: startDate,
+                        [Op.lte]: endDate
+                    },
+                }
+            });
+
+            // Map over the results to format the array structure
+            return users.map(user => ({
+                user_id: user.get('user_id') as number,
+                name: user.get('name') as string,
+                status: user.get('status') as UserStatus // Cast to UserStatus type
+            }));
+        } catch (err) {
+            return this.handleError(err, 'Error during loading students');
+        }
+    };
+
+
+    private handleError(err: unknown, message: string): never {
+        console.error(message);
+        if (err instanceof Error) {
+            console.error(err.message);
+            throw err; // Rethrow the error to maintain the stack trace
+        } else {
+            throw new Error('An unexpected error occurred');
+        }
     }
 
     dropdata = async (req:any) => {
@@ -128,36 +175,40 @@ class FakeData_Controller {
 
     sessionFill = async (startDate?: Date, endDate?: Date) => {
         // l('sessionFill work')
+
+        const twoWeeksAgo = new Date();
+        twoWeeksAgo.setDate(twoWeeksAgo.getDate() - 14);
+
+        // Set default values if not provided
+        startDate = startDate || twoWeeksAgo;
+        endDate = endDate || new Date();
+
+        let users_local: Partial<UserAttributes>[]
+        let staff_local: StaffAttributes[]
+        let offices_local: OfficeAttributes[]
+        let sessions_local: StaffAttributes[]
+
+
+
+        users_local = await this.services.usersData(startDate, endDate)
+
+
+
         try {
-            const twoWeeksAgo = new Date();
-            twoWeeksAgo.setDate(twoWeeksAgo.getDate() - 14);
-
-            // Set default values if not provided
-            startDate = startDate || twoWeeksAgo;
-            endDate = endDate || new Date();
-
-            const students_local:UserAttributes[] = await User_model.findAll({
-                where: {
-                    createdAt: {
-                        [Op.gte]: startDate,
-                        [Op.lte]: endDate
-                    }
-                }
-            });
-
             const employees_local = await Employee_model.findAll();
 
             if (!employees_local || employees_local.length === 0) {
                 throw new Error('employees_local is undefined or empty');
             }
+        } catch (err) {return this.handleError(err, 'Error during loading employee')}
 
+        try{
             const offices_local = await Office_model.findAll();
 
             if (!offices_local || offices_local.length === 0) {
                 throw new Error('offices_local is undefined or empty');
             }
-
-
+        } catch (err) {return this.handleError(err, 'Error during loading offices')}
 
 
 
@@ -175,11 +226,11 @@ class FakeData_Controller {
             let uniqueIndex = 0;
             const uniqueTimes = new Set();
 
-            students_local.forEach((stud_loc) => {
+            users_local.forEach((stud_loc) => {
                 const session_number: number = this.getRandomElement([1, 2, 3]) || 1;
 
                 for (let i = 0; i < session_number; i++) {
-                    const randomEmployee = this.getRandomElement(employees_local);
+                    const randomEmployee = this.getRandomElement(staff_local);
 
                     let randomDay;
                     let randomHour;
@@ -208,9 +259,9 @@ class FakeData_Controller {
                     sessions.push({
                         'index': uniqueIndex,
                         'student_id': stud_loc.user_id,
-                        'employee_id': randomEmployee.id, // Now it's guaranteed not to be undefined
+                        'employee_id': randomEmployee.staff_id, // Now it's guaranteed not to be undefined
                         'student_name': stud_loc.name,
-                        'office_id':randomOffice.id,
+                        'office_id':randomOffice.office_id,
                         'day':randomDay,
                         'time': randomHour,
                     });
@@ -259,15 +310,7 @@ class FakeData_Controller {
             // console.log('sessions = ', sessions);
 
             return true;
-        } catch (err) {
-            if (err instanceof Error) {
-                console.error(err.message);
-                return err;
-            } else {
-                console.error('An unexpected error occurred');
-                return new Error('An unexpected error occurred');
-            }
-        }
+
     }
 
     // makeSessionFromStudent = (
@@ -328,8 +371,6 @@ class FakeData_Controller {
     // }
     //
 
-
-
     getRandomElement = <T>(array: T[]): T | undefined =>{
         if (array.length === 0) {
             return undefined;
@@ -347,6 +388,8 @@ class FakeData_Controller {
         const randomIndex = Math.floor(Math.random() * array.length);
         return array[randomIndex];
     }
+
+
 }
 
 export default new FakeData_Controller()
