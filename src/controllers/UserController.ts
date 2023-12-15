@@ -7,6 +7,7 @@ class UserController {
         try {
             const skip = parseInt(req.query.skip as string) || 0;
             const limit = parseInt(req.query.limit as string) || 100;
+            const user_id = parseInt(req.query.user_id as string) || -1;
 
             const fields: (keyof PartialUserAttributes)[] = ['user_id', 'name', 'surname'];
 

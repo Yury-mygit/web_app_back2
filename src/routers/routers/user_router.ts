@@ -27,11 +27,17 @@ const router = express.Router();
  *           schema:
  *             type: integer
  *             format: int32
+ *         - name: user_id
+ *           in: query
+ *           description: Id of user
+ *           required: false
+ *           schema:
+ *             type: integer
+ *             format: int32
  *       responses:
  *         '200':
  *           description: Successful operation
  *
- *   /user/:
  *     post:
  *       tags:
  *         - user
@@ -109,107 +115,100 @@ const router = express.Router();
  *                     errorCode:
  *                       type: integer
  *                       description: Custom error code indicating the specific error
- */
-
-
-router.get('/', studentController.getAllStudents);
-
-router.post('/', studentController.createStudent);
-
-/**
- * @openapi
- * /user/:
- *   patch:
- *     tags:
- *       - user
- *     summary: Update
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             properties:
- *               firstName:
- *                 type: string
- *               lastName:
- *                 type: string
- *               parentsName:
- *                 type: string
- *               age:
- *                 type: integer
- *               status:
- *                 type: string
  *
- *               sessionTransferRate:
- *                 type: integer
- *               percentageOfAbsences:
- *                 type: number
- *               contactEmail:
- *                 type: string
- *               contactTelephone:
- *                 type: string
- *               allowTelegramNotification:
- *                 type: boolean
- *               address:
- *                 type: string
- *               foundUsThrough:
- *                 type: string
- *               online:
- *                 type: boolean
- *               notes:
- *                 type: string
- *
- *
- *     responses:
- *       '200':
- *         description: Successful operation
+ *     patch:
+ *       tags:
+ *         - user
+ *       summary: Update
+ *       requestBody:
+ *         required: true
  *         content:
  *           application/json:
  *             schema:
  *               type: object
  *               properties:
- *                 id:
+ *                 firstName:
+ *                   type: string
+ *                 lastName:
+ *                   type: string
+ *                 parentsName:
+ *                   type: string
+ *                 age:
  *                   type: integer
+ *                 status:
+ *                   type: string
  *
- *         '400':
- *           description: Bad request
+ *                 sessionTransferRate:
+ *                   type: integer
+ *                 percentageOfAbsences:
+ *                   type: number
+ *                 contactEmail:
+ *                   type: string
+ *                 contactTelephone:
+ *                   type: string
+ *                 allowTelegramNotification:
+ *                   type: boolean
+ *                 address:
+ *                   type: string
+ *                 foundUsThrough:
+ *                   type: string
+ *                 online:
+ *                   type: boolean
+ *                 notes:
+ *                   type: string
+ *
+ *
+ *       responses:
+ *         '200':
+ *           description: Successful operation
  *           content:
  *             application/json:
  *               schema:
  *                 type: object
  *                 properties:
- *                   error:
- *                     type: string
- *                   errorCode:
+ *                   id:
  *                     type: integer
- *                     description: Custom error code indicating the specific error
- *         '500':
- *           description: Internal server error
- *           content:
- *             application/json:
- *               schema:
- *                 type: object
- *                 properties:
- *                   error:
- *                     type: string
- *                   errorCode:
- *                     type: integer
- *                     description: Custom error code indicating the specific error
+ *
+ *           '400':
+ *             description: Bad request
+ *             content:
+ *               application/json:
+ *                 schema:
+ *                   type: object
+ *                   properties:
+ *                     error:
+ *                       type: string
+ *                     errorCode:
+ *                       type: integer
+ *                       description: Custom error code indicating the specific error
+ *           '500':
+ *             description: Internal server error
+ *             content:
+ *               application/json:
+ *                 schema:
+ *                   type: object
+ *                   properties:
+ *                     error:
+ *                       type: string
+ *                     errorCode:
+ *                       type: integer
+ *                       description: Custom error code indicating the specific error
+ *
+ *     delete:
+ *       tags:
+ *          - user
+ *       description: Fill database with test random data
+ *       responses:
+ *         200:
+ *           description: Returns a success message.
  */
+
+router.get('/', studentController.getAllStudents);
+
+router.post('/', studentController.createStudent);
+
 router.patch('/', studentController.updateStudent);
 
-/**
- * @openapi
- * /user/:
- *   delete:
- *     tags:
- *        - user
- *     description: Fill database with test random data
- *     responses:
- *       200:
- *         description: Returns a success message.
- */
 router.delete('/:id', studentController.deleteStudent);
 
 export default router;

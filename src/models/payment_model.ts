@@ -19,16 +19,17 @@ export enum PaymentStatus {
 }
 
 export enum ProductType {
-    PRODUCT_A = "product_a",
-    PRODUCT_B = "product_b",
-    PRODUCT_C = "product_c"
+    subscription_1 = "1",
+    subscription_4 = "4",
+    subscription_8 = "8"
 }
 
 export interface PayAttributes{
     pay_id: number;
     user_id: number;
     status: PaymentStatus;
-    product_type: ProductType
+    product_type: ProductType;
+    spend:number
 }
 export interface PayCreationAttributes extends Optional<PayAttributes, 'pay_id'> {}
 
@@ -52,6 +53,10 @@ class PaymentModel extends Model {
     get product_type(): ProductType {
         return this.getDataValue('product_type');
     }
+
+    @AllowNull(false)
+    @Column
+    spend!: number;
 
     set product_type(value: ProductType) {
         this.setDataValue('product_type', value);

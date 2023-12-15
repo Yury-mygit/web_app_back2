@@ -14,31 +14,12 @@ export enum Status {
     active = 'active',
 }
 
-export interface I_Session {
-    id?: number;
-    startDateTime: string;
-    duration: number;
-    week_first_day: string;
-    online: boolean;
-    paid: boolean;
-    confirmed: boolean;
-    student_id: number;
-    employee_id: number;
-    repeatable: boolean;
-    notes: string;
-    office_id: number;
-    performed: boolean;
-    serviceType: ServiceType;
-    status: Status;
-    payment_id: number;
-}
-
 @Table({ tableName: 'session' })
 class SessionModel extends Model {
     @AutoIncrement
     @PrimaryKey
     @Column
-    id!: number;
+    session_id!: number;
 
     @AllowNull(false)
     @Column
@@ -66,11 +47,11 @@ class SessionModel extends Model {
 
     @ForeignKey(() => User_model)
     @Column
-    student_id!: number;
+    user_id!: number;
 
     @ForeignKey(() => Employee_model)
     @Column
-    employee_id!: number;
+    staff_id!: number;
 
     @AllowNull(false)
     @Column

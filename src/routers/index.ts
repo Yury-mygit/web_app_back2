@@ -1,5 +1,5 @@
 import express from 'express';
-import studentsRouter from './routers/student_router';
+import studentsRouter from './routers/user_router';
 import employeesRouter from './routers/employee_router';
 import sessionsRouter from './routers/session_router';
 import officesRouter from './routers/office_router';

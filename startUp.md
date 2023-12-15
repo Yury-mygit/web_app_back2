@@ -340,3 +340,6 @@ This will log all errors to error.log and all logs to combined.log.
 Remember to place the error handling middleware after all your routes, so that any errors that occur while handling requests will be passed to it.
 
 https://www.youtube.com/watch?v=rXfSZRI-RP8&t=274s&ab_channel=IT-KAMASUTRA
+
+docker run --name bot_db_postgres  --network net -e POSTGRES_PASSWORD=321 -e POSTGRES_DB=users -p 5400:5432 -d postgres
+docker run --name bot_db_postgres   -e POSTGRES_PASSWORD=321 -e POSTGRES_DB=users -p 5400:5432 -d postgres

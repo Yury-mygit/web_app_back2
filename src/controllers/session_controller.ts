@@ -1,20 +1,33 @@
 import SessionModel, {ServiceType, Status} from "../models/session_model";
 import { validationResult } from 'express-validator';
+import SessionAttributes, {PartialSessionAttributes} from "../interface/session_interfases";
+import SessionDataHandler from "../database/handlers/SessionDataHandler";
 import {l} from '../servises/serv'
 
 class SessionController {
-    async getAllSessions(req:any, res:any, next:any){
+    async getAllSessions(req: any, res: any, next: any) {
         try {
             const skip = parseInt(req.query.skip as string) || 0;
             const limit = parseInt(req.query.limit as string) || 100;
+            const user_id = req.query.user_id ? parseInt(req.query.user_id as string) : null;
 
-            const students = await SessionModel.findAll({
+            const fields: (keyof PartialSessionAttributes)[] = ["session_id", "user_id", "paid"];
+
+            const options: any = {
                 offset: skip,
                 limit: limit,
-                order:['id']
-            });
+                order: ['session_id'],
+                attributes: fields
+            };
 
-            res.json(students);
+            // If user_id is provided, add a where clause to filter by user_id
+            if (user_id) {
+                options.where = { user_id: user_id };
+            }
+
+            const sessions = await SessionModel.findAll(options);
+
+            res.json(sessions);
         } catch (err) {
             if (err instanceof Error) {
                 res.status(500).json({ error: err.message });
@@ -123,6 +136,22 @@ class SessionController {
         } catch (err: any) {
             res.status(500).json(err)
         }
+    }
+
+    fulfill = async (req:any, res:any, next:any) =>{
+
+        const payload = req.body | req.params
+
+
+        /*
+        *
+        * Найти в базе данный сессию с нужным id
+        * Прочитать у найденной сессии,к какому пользователю она относиться в поле user_id
+        * Найти текущий абонемент пользователя
+        * добавить израсходованное занятие. если все занятия израсходованы,отметить абонемент как использованный
+        *
+        *  */
+
     }
 }
 

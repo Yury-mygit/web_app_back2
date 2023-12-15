@@ -79,7 +79,7 @@ class PaymentDataHandler {
         return records;
     }
 
-    async read_all_by_user(user_id: string): Promise<Partial<PayAttributes>[]> {
+    static async read_all_by_user(user_id: string): Promise<Partial<PayAttributes>[]> {
         const records = await PaymentModel.findAll({
             where: { user_id },
             attributes: ['pay_id', 'user_id', 'product_type', 'status']  // Specify the fields you want to include
@@ -88,10 +88,10 @@ class PaymentDataHandler {
         return records;
     }
 
-    async read_by_pay_id(pay_id: string): Promise<Partial<PayAttributes>> {
+    static async read_by_pay_id(pay_id: string): Promise<Partial<PayAttributes>> {
         const record = await PaymentModel.findOne({
             where: { pay_id },
-            attributes: ['pay_id', 'user_id', 'product_type', 'status']  // Specify the fields you want to include
+            attributes: ['pay_id', 'user_id', 'product_type', 'status', 'spend']  // Specify the fields you want to include
         });
 
         if (!record) {

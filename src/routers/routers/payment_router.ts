@@ -5,6 +5,7 @@ import Validator from '../validators/Validator'
 export const paymentsRouter = express.Router();
 
 paymentsRouter.post('/getall', ...Validator.validateGetAllPays(), controller.getAllPays_v2);
+paymentsRouter.post('/get_by_telegram_id', ...Validator.validate_get_by_telegram_id(), controller.getByTelegramID);
 paymentsRouter.post('/create', ...Validator.validateCreatePay(), controller.createPay_v2);
 paymentsRouter.patch('/update', ...Validator.validateUpdatePay(), controller.updatePay_v2);
 paymentsRouter.delete("/delete",...Validator.validateDelete(), controller.deletePayment_v2);
@@ -46,6 +47,29 @@ paymentsRouter.delete("/delete",...Validator.validateDelete(), controller.delete
  *         '200':
  *           description: Successful operation
  *
+ *   /payment/get_by_telegram_id:
+ *     post:
+ *       tags:
+ *         - Payment
+ *       summary: Your route summary
+ *       description: Your route description
+ *       requestBody:
+ *         required: true
+ *         content:
+ *           application/json:
+ *             schema:
+ *                type: object
+ *                properties:
+ *                 telegram_id:
+ *                   type: integer
+ *                   description: The ID of the student to update
+ *                   default: 1
+ *                required:
+ *                 - telegram_id
+ *       responses:
+ *         '200':
+ *           description: Successful operation
+ *
  *   /payment/update:
  *     patch:
  *       tags:
@@ -74,7 +98,7 @@ paymentsRouter.delete("/delete",...Validator.validateDelete(), controller.delete
  *                 product_type:
  *                   type: string
  *                   description: type of payments
- *                   default: product_a
+ *                   default: subscription_1
  *                required:
  *                 - pay_id
  *
@@ -102,7 +126,7 @@ paymentsRouter.delete("/delete",...Validator.validateDelete(), controller.delete
  *                 product_type:
  *                   type: string
  *                   description: type of payments
- *                   default: product_a
+ *                   default: subscription_1
  *                required:
  *                 - user_id
  *                 - product_type

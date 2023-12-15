@@ -34,6 +34,31 @@ class Validator {
         ];
     }
 
+    static validate_get_by_telegram_id() {
+        return [
+            // body('user_id').exists().withMessage(this.messegeBylder('user_id is required')),
+            body('telegram_id').isNumeric().toInt().withMessage(this.messegeBylder(' user_id must be a number')),
+            (req: any, res: any, next: any) => {
+                const errors = validationResult(req);
+                if (!errors.isEmpty()) {
+                    return res.status(400).json({ errors: errors.array() });
+                }
+                next();
+            },
+            (req: any, res: any, next: any) => {
+                const validProperties = ['telegram_id'];
+                const extraProperties = Object.keys(req.body).filter(prop => !validProperties.includes(prop));
+                if (extraProperties.length) {
+                    return res.status(400).json({ errors: `Validator: Invalid properties in request: ${extraProperties.join(', ')}` });
+                }
+                next();
+            },
+            (req: any, res: any, next: any) => {
+                next();
+            }
+        ];
+    }
+
     static validateCreatePay() {
         return [
             body('user_id').exists().withMessage('id is required'),

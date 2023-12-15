@@ -27,6 +27,13 @@ const router = express.Router();
  *           schema:
  *             type: integer
  *             format: int32
+ *         - name: user_id
+ *           in: query
+ *           description: Id of user
+ *           required: false
+ *           schema:
+ *             type: integer
+ *             format: int32
  *       responses:
  *         '200':
  *           description: Successful operation
@@ -57,7 +64,7 @@ const router = express.Router();
  *       responses:
  *         '201':
  *           description: Student added successfully
-
+ *   /session/fulfill:
  *     patch:
  *       tags:
  *           - Session
@@ -68,7 +75,19 @@ const router = express.Router();
  *         content:
  *           application/json:
  *             schema:
- *               $ref: '#/components/schemas/Student'
+ *                type: object
+ *                properties:
+ *                 studentId:
+ *                   type: integer
+ *                   description: The ID of the student to update
+ *                 newGrade:
+ *                   type: string
+ *                   description: The new grade for the student
+ *                 newAddress:
+ *                   type: string
+ *                   description: The new address for the student
+ *                required:
+ *                 - studentId
  *       responses:
  *         '200':
  *           description: Student updated successfully
@@ -79,4 +98,8 @@ router.patch('/',sessionController.updateSession)
 router.post('/', sessionController.createSession)
 router.delete('/', sessionController.deleteSession)
 
+router.post("/fulfill", sessionController.fulfill)
+
 export default router;
+
+
