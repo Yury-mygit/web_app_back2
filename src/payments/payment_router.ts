@@ -1,14 +1,77 @@
 import express from 'express';
-import controller from '../../controllers/Payment_Contriller'
-import Validator from '../validators/Validator'
+import controller from '../controllers/payments/Payment_Contriller'
+import Validator from './Validator'
 
 export const paymentsRouter = express.Router();
 
-paymentsRouter.post('/getall', ...Validator.validateGetAllPays(), controller.getAllPays_v2);
+paymentsRouter.post('/getall', ...Validator.validateGetAllPays(), controller.getAllPays);
 paymentsRouter.post('/get_by_telegram_id', ...Validator.validate_get_by_telegram_id(), controller.getByTelegramID);
-paymentsRouter.post('/create', ...Validator.validateCreatePay(), controller.createPay_v2);
-paymentsRouter.patch('/update', ...Validator.validateUpdatePay(), controller.updatePay_v2);
-paymentsRouter.delete("/delete",...Validator.validateDelete(), controller.deletePayment_v2);
+paymentsRouter.post('/create', ...Validator.validateCreatePay(), controller.createPay);
+paymentsRouter.patch('/update', ...Validator.validateUpdatePay(), controller.updatePay);
+
+/**
+ * @openapi
+ * paths:
+ *   /payment/consume:
+ *     post:
+ *       tags:
+ *           - Payment
+ *       summary: Update a new payment record
+ *       description: Consume a payment or abonnement session
+ *       requestBody:
+ *         required: true
+ *         content:
+ *           application/json:
+ *             schema:
+ *                type: object
+ *                properties:
+ *                 user_id:
+ *                   type: integer
+ *                   description: The ID of the student to update
+ *                   default: 1
+ *                required:
+ *                 - pay_id
+ *
+ *       responses:
+ *         '201':
+ *           description: Student added successfully
+ */
+paymentsRouter.post('/consume', ...Validator.validateConsumePay(), async (req, res, next) => {
+    try {
+        // @ts-ignore
+        await controller.consumePayment({ req, res, next });
+    } catch (error) {
+        next(error);
+    }
+});
+
+/**
+ * @openapi
+ * paths:
+ *   /payment/test:
+ *     patch:
+ *       tags:
+ *           - Payment
+ *       summary: Update a new payment record
+ *       description: Consume a payment or abonnement session
+ *       requestBody:
+ *         required: true
+ *         content:
+ *           application/json:
+ *             schema:
+ *                type: object
+ *                properties:
+ *
+ *
+ *       responses:
+ *         '201':
+ *           description: Student added successfully
+ */
+paymentsRouter.patch('/test', controller.test)
+
+
+
+paymentsRouter.delete("/delete",...Validator.validateDelete(), controller.deletePayment);
 
 
 /**
@@ -31,6 +94,10 @@ paymentsRouter.delete("/delete",...Validator.validateDelete(), controller.delete
  *                   type: integer
  *                   description: The ID of the student to update
  *                   default: 1
+ *                 telegram_id:
+ *                   type: integer
+ *                   description: The ID of the student to update
+ *                   default: 565047052
  *                 skip:
  *                   type: integer
  *                   description: skip
@@ -39,10 +106,8 @@ paymentsRouter.delete("/delete",...Validator.validateDelete(), controller.delete
  *                   type: integer
  *                   description: limit
  *                   default: 100
- *                required:
- *                 - user_id
- *                 - skip
- *                 - limit
+
+ *
  *       responses:
  *         '200':
  *           description: Successful operation
@@ -63,7 +128,7 @@ paymentsRouter.delete("/delete",...Validator.validateDelete(), controller.delete
  *                 telegram_id:
  *                   type: integer
  *                   description: The ID of the student to update
- *                   default: 1
+ *                   default: 733685428
  *                required:
  *                 - telegram_id
  *       responses:
@@ -95,10 +160,10 @@ paymentsRouter.delete("/delete",...Validator.validateDelete(), controller.delete
  *                   type: string
  *                   description: type of payments
  *                   default: active
- *                 product_type:
- *                   type: string
+ *                 product_id:
+ *                   type: integer
  *                   description: type of payments
- *                   default: subscription_1
+ *                   default: 1
  *                required:
  *                 - pay_id
  *
@@ -123,13 +188,19 @@ paymentsRouter.delete("/delete",...Validator.validateDelete(), controller.delete
  *                   type: integer
  *                   description: The ID of the student to update
  *                   default: 1
- *                 product_type:
- *                   type: string
+ *                 telegram_id:
+ *                   type: integer
+ *                   description: The ID of the student to update
+ *                   default: 565047052
+ *                 product_id:
+ *                   type: integer
  *                   description: type of payments
- *                   default: subscription_1
+ *                   default: 2
+ *                oneOf:
+ *                  - required: [ "user_id" ]
+ *                  - required: [ "telegram_id" ]
  *                required:
- *                 - user_id
- *                 - product_type
+ *                 - product_id
  *       responses:
  *         '201':
  *           description: Student added successfully

@@ -1,5 +1,5 @@
 import express from 'express';
-import fakeData_Controller from "../../controllers/fake_controller";
+import fakeData_Controller from "../../MOK/fake_controller";
 
 const router = express.Router();
 
@@ -7,7 +7,7 @@ const router = express.Router();
 
 router.post('/fill', fakeData_Controller.fill_data);
 
-router.post('/fill/payments', fakeData_Controller.payments)
+router.post('/fill/payments', fakeData_Controller.fill_payments_by_fake_data)
 
 router.post('/check', fakeData_Controller.check)
 

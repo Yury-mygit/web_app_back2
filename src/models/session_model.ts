@@ -2,7 +2,7 @@ import { Model, Column, Table, AutoIncrement, PrimaryKey, AllowNull, DataType, F
 import  User_model  from './user/user_model';
 import  Employee_model  from './employee_model';
 import  Office_model  from './office_model';
-import  Payment_model  from './payment_model';
+import  Payment_model  from '../payments/payment_model';
 import {sequelize} from "../database/database";
 
 export enum ServiceType {

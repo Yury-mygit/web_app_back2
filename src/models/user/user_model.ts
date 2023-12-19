@@ -29,19 +29,19 @@ export class User_model extends Model {
     @Column(DataType.ENUM('active', 'inactive'))
     status!: UserStatus;
 
-    @AllowNull(false)
+    @AllowNull(true)
     @Column(DataType.FLOAT)
     attendance!: number;
 
-    @AllowNull(false)
+    @AllowNull(true)
     @Column(DataType.FLOAT)
     absences!: number;
 
-    @AllowNull(false)
+    @AllowNull(true)
     @Column
     email!: string;
 
-    @AllowNull(false)
+    @AllowNull(true)
     @Column
     telephone!: string;
 

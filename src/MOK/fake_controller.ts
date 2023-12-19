@@ -4,18 +4,19 @@ Controller that fill db with fake data. Pay attention! Db will drop and fill wit
 import {Model, Op} from 'sequelize'; // Make sure to import Model from sequelize
 import User_model from "../models/user/user_model";
 import UserAttributes, {UserCreationAttributes, UserStatus} from "../interface/user_interface"
-import SessionAttributes from "../interface/session_interfases";
+import SessionAttributes, {PartialSessionAttributes} from "../interface/session_interfases";
 
 import Session_model, {ServiceType, Status} from "../models/session_model";
 import Office_model, {OfficeAttributes} from "../models/office_model";
 import Employee_model, {StaffAttributes} from "../models/employee_model";
-import Payment_model from "../models/payment_model";
-import payment_model, {PayCreationAttributes, PaymentStatus, ProductType} from "../models/payment_model";
+import Payment_model from "../payments/payment_model";
+import payment_model, {PayCreationAttributes, PaymentStatus} from "../payments/payment_model";
 
 import {faker} from "@faker-js/faker";
 
 import PayHandler from '../database/handlers/PaymentDataHandler'
 import {NextFunction, Request, Response} from "express";
+import Product_model, {ProductAttributes, ProductType} from "../models/product_model";
 
 const payHandler = new PayHandler
 
@@ -100,7 +101,13 @@ class FakeData_Controller {
         return true;
     };
 
-    payments = async (req: Request, res: Response, next: NextFunction) => {
+
+
+
+
+
+
+    fill_payments_by_fake_data = async (req: Request, res: Response, next: NextFunction) => {
 
         try {
             await payment_model.sync({force: true})
@@ -123,35 +130,26 @@ class FakeData_Controller {
             }
         });
 
-        /*
-        *
-        * 1. Run throw session
-        * take one session and check which user on it
-        * check payments if there a paymens in New status
-        *   if exist, we check
-        *
-        *
-        *
-        *
-        * */
+        if ( !session ) throw new Error("There is no session")
+
         console.log("================START===========================")
         for (const ses of session) {
             console.log(" ")
 
 
             // NEW ===
-            try{
-                const  pay = await Payment_model.findOne({ where: {
-                        user_id: ses.user_id,
-                        status: PaymentStatus.NEW
-                       }})
-                if (pay != undefined){
-                    // console.log(pay.product_type, '  ', pay.spend)
-                }
-                // console.log('in new',pay?.product_type)
-            }catch (err){
-
-            }
+            // try{
+            //     const  pay = await Payment_model.findOne({ where: {
+            //             user_id: ses.user_id,
+            //             status: PaymentStatus.NEW
+            //            }})
+            //     if (pay != undefined){
+            //         // console.log(pay.product_type, '  ', pay.spend)
+            //     }
+            //     // console.log('in new',pay?.product_type)
+            // }catch (err){
+            //
+            // }
 
 
             // ACTIVE ============
@@ -160,12 +158,22 @@ class FakeData_Controller {
                         user_id: ses.user_id,
                         status: PaymentStatus.ACTIVE
                     }})
+
+                if (!pay) throw new Error("Error there is no payment")
+
+                const product = await Product_model.findOne({where:{
+                        product_id: pay.product_id
+                    }})
+
+                if (!product) throw new Error( "Error there is no product")
+
                 if(pay) {
                     console.log('Payment is found! id=', pay.pay_id, 'for user' ,ses.user_id,'spended', pay.spend)
-                    if (parseInt(pay?.product_type) > pay?.spend) {
+                    console.log(product)
+                    if (parseInt(product?.product_type) > pay?.spend) {
                         const payload: PayCreationAttributes = {
                             user_id: ses.user_id,
-                            product_type: pay.product_type,
+                            product_id: pay.product_id,
                             status: PaymentStatus.ACTIVE,
                             spend: pay?.spend + 1
                         };
@@ -176,10 +184,10 @@ class FakeData_Controller {
                         } )
                     }
 
-                    if (parseInt(pay?.product_type) == pay?.spend) {
+                    if (parseInt(product?.product_type) == pay?.spend) {
                         const payload: PayCreationAttributes = {
                             user_id: ses.user_id,
-                            product_type: pay.product_type,
+                            product_id: pay.product_id,
                             status: PaymentStatus.SPENT,
                             spend: pay?.spend
                         };
@@ -193,42 +201,50 @@ class FakeData_Controller {
                 }
 
             }catch (err){
-
+                console.log(err)
             }
+
+
+
+
 
 
 
             console.log(`There is no active payments for user ${ses.user_id}, making new one`)
 
-            const enumValues = Object.values(ProductType).filter(v => typeof v === 'string') as string[];
+            const products = await Product_model.findAll({
+                where: {
+                    product_type: ProductType.subscription // Assuming ProductType.subscription is a valid enum or value
+                },
+                attributes: ['product_id', 'product_type', 'name', 'desc']
+            });
 
-            // Generate a random index based on the number of enum values
-            const randomIndex = Math.floor(Math.random() * enumValues.length);
+            if (!products || products.length === 0) throw new Error("There are no Products");
 
-            // Select a random value from the enum
-            const randomEnumValue = enumValues[randomIndex] as ProductType;
+            const randomIndex = Math.floor(Math.random() * products.length);
+            const new_product = products[randomIndex];
+
+// Assuming 'name' is a string that contains numbers and you want to extract the first number
+            const str = new_product.name;
+            const number = parseInt(str.match(/\d+/)?.[0] || '', 10);
 
             let payload: PayCreationAttributes
 
-            console.log('aasSS',randomEnumValue, 'ASA', randomEnumValue == "1")
-            if (randomEnumValue == "1") {
+            if (number == 1) {
                 payload = {
                     user_id: ses.user_id,
-                    product_type: randomEnumValue,
+                    product_id: new_product.product_id,
                     status: PaymentStatus.SPENT,
                     spend:1
                 };
             }else{
                 payload = {
                     user_id: ses.user_id,
-                    product_type: randomEnumValue,
+                    product_id: new_product.product_id,
                     status: PaymentStatus.ACTIVE,
                     spend:1
                 };
             }
-
-
-
 
             await Payment_model.create(payload ) // This works if the DB supports it (e.g., PostgreSQL)
 
@@ -248,12 +264,17 @@ class FakeData_Controller {
         res.json({"Status":"ok"} )
     }
 
+
+
+
+
     fill_data = async (req: Request, res: Response, next: NextFunction) => {
-        this.dropdata(req).then(()=>
+        this.dropData(req).then(()=>
             Promise.all([
-                this.studentfill(5),
+                this.userFill(5),
                 this.employeefill(3),
-                this.officeFill(2)
+                this.officeFill(2),
+                this.productFill()
             ]))
             .then(()=>this.sessionFill())
             .then(()=>this.createPayments())
@@ -266,7 +287,7 @@ class FakeData_Controller {
     }
 
     //Handlers =============================================================
-    private dropdata = async (req:any) => {
+    private dropData = async (req:any) => {
 
         this.property1 = req.body.property1;
         this.property2 = req.body.property2;
@@ -277,12 +298,13 @@ class FakeData_Controller {
             await Office_model.sync({force:true})
             await Session_model.sync({force:true})
             await Payment_model.sync({force:true})
+            await Product_model.sync({force:true})
             return true
         } catch (err) {
             return err || undefined
         }
     }
-    private studentfill = async ( number: number) => {
+    private userFill = async ( number: number) => {
 
         const t_ids = [733685428, 565047052, 565047052001, 565047052002, 565047052003, 565047052004, 565047052005]
 
@@ -356,6 +378,40 @@ class FakeData_Controller {
             throw err;
         }
     }
+
+    prods = [
+        {name:'subscription_1', desk:'Разовое занятие', cost: 1100},
+        {name:'subscription_4', desk:'Абонемент на 4 занятия',  cost: 4100},
+        {name:'subscription_8', desk:'Абонемент на 8 занятия',  cost: 7600},
+        {name:'test_1', desk:'Абонемент на 8 занятия', cost: 10},
+        {name:'test_2', desk:'Абонемент на 8 занятия', cost: 15},
+        {name:'test_3', desk:'Абонемент на 8 занятия', cost: 20},
+    ]
+
+
+
+
+
+    private productFill = async (products: { name: string; desk: string }[] = this.prods) => {
+        try {
+            for (let product of products) { // Changed "in" to "of" to iterate over values
+                await Product_model.create({
+                    product_type: ProductType.subscription,
+                    name: product.name,
+                    desc: product.desk, // Changed "desk" to "description"
+                    cost: 1000,
+                });
+            }
+            return true;
+        } catch (err) {
+            throw err;
+        }
+    }
+
+
+
+
+
 
     private async createSessions(users_local: Partial<UserAttributes>[], staff_local: StaffAttributes[], offices_local: OfficeAttributes[]): Promise<void> {
         const sessions: CustomSessionAttributes[] = [];

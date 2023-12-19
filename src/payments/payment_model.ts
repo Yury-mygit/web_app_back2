@@ -6,11 +6,13 @@ import {
     PrimaryKey,
     AllowNull,
     DataType,
-    ForeignKey
+    ForeignKey,
+    BelongsTo
 } from 'sequelize-typescript';
-import { User_model } from './user/user_model';
+import { User_model } from '../models/user/user_model';
 import { Optional } from 'sequelize';
 import {sequelize} from "../database/database";
+import ProductModel from "../models/product_model";
 
 export enum PaymentStatus {
     NEW = "new",
@@ -28,19 +30,19 @@ export interface PayAttributes{
     pay_id: number;
     user_id: number;
     status: PaymentStatus;
-    product_type: ProductType;
+    product_id: number;
     spend:number
 }
 export interface PayCreationAttributes extends Optional<PayAttributes, 'pay_id'> {}
 
 @Table({ tableName: 'payment' })
-class PaymentModel extends Model {
+export default class PaymentModel extends Model<PayAttributes, PayCreationAttributes> {
     @AutoIncrement
     @PrimaryKey
     @Column
     pay_id!: number;
 
-    @ForeignKey(() => User_model)
+    // @ForeignKey(() => User_model)
     @Column
     user_id!: number;
 
@@ -49,21 +51,17 @@ class PaymentModel extends Model {
     status!: PaymentStatus;
 
     @AllowNull(false)
-    @Column(DataType.STRING)
-    get product_type(): ProductType {
-        return this.getDataValue('product_type');
-    }
-
-    @AllowNull(false)
     @Column
     spend!: number;
 
-    set product_type(value: ProductType) {
-        this.setDataValue('product_type', value);
-    }
+    @ForeignKey(() => ProductModel)
+    @Column
+    product_id!: number;
 
+    @BelongsTo(() => ProductModel)
+    product?: ProductModel;
 }
 
-sequelize.addModels([PaymentModel])
+sequelize.addModels([ProductModel, PaymentModel]);
 
-export default PaymentModel
+// export default PaymentModel
