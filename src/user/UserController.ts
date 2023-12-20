@@ -2,11 +2,9 @@ import User_model from "../models/user/user_model";
 import UserAttributes from "../interface/user_interface";
 import { Request, Response } from 'express';
 import UserService from './UserService';
-import { CreateUserDTO, UpdateUserDTO } from '../gtos/UserDTO';
+import { CreateUserDTO, UpdateUserDTO } from './UserDTO';
 
 type PartialUserAttributes = Pick<UserAttributes, 'user_id' | 'name' | 'surname' | 'telegram_id'>;
-
-
 
 class UserController {
     private userService= UserService;
@@ -18,7 +16,7 @@ class UserController {
         try {
             const skip = parseInt(req.query.skip as string) || 0;
             const limit = parseInt(req.query.limit as string) || 100;
-            const students = await this.userService.getAllStudents(skip, limit);
+            const students = await this.userService.getAllUsers(skip, limit);
             res.json(students);
         } catch (error: any) {
             res.status(500).json({ error: error.message });
@@ -32,7 +30,7 @@ class UserController {
                 ...req.body,
                 dateOfInitialDiagnosis: Date.now()
             });
-            const user = await this.userService.createStudent(createStudentDTO)
+            const user = await this.userService.createUser(createStudentDTO)
             res.status(201).json(user);
         } catch (error: any) {
             console.log("Error in createUser: ", error)
@@ -43,7 +41,7 @@ class UserController {
     async updateUser(req: Request, res: Response) {
         try {
             const updateStudentDTO = new UpdateUserDTO(req.body);
-            await this.userService.updateStudent(updateStudentDTO);
+            await this.userService.updateUser(updateStudentDTO);
             res.json({ message: 'Student updated successfully' });
         } catch (error: any) {
             res.status(500).json({ error: error.message });
@@ -52,8 +50,8 @@ class UserController {
 
     async deleteUser(req: Request, res: Response) {
         try {
-            const studentId = parseInt(req.params.id);
-            await this.userService.deleteStudent(studentId);
+            const userId = parseInt(req.params.id);
+            await this.userService.deleteUser(userId);
             res.json({ message: 'Student deleted successfully' });
         } catch (error: any) {
             res.status(500).json({ error: error.message });

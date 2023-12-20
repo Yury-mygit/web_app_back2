@@ -4,7 +4,7 @@ import swaggerUi from 'swagger-ui-express';
 import cors from 'cors';
 import bodyParser from 'body-parser';
 import { sequelize } from './database/database';
-import routes from './routers';
+import routes from './index_routes';
 import 'dotenv/config'
 const path = require('path');
 const fs = require('fs');
@@ -38,9 +38,9 @@ const swaggerOptions = {
     },
     apis: [
         './src/app.ts',
-        './src/routers/index.ts',
-        './src/routers/routers/fake_router.ts',
-        './src/user/user_router.ts',
+        './src/routers/index_routes.ts',
+        './src/MOK/fake_router.ts',
+        './src/user/UserRouter.ts',
         './src/routers/routers/office_router.ts',
         './src/routers/routers/product_router.ts',
         './src/routers/routers/session_router.ts',

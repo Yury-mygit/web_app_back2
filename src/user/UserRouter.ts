@@ -116,16 +116,8 @@ const router = express.Router();
  *                       type: integer
  *                       description: Custom error code indicating the specific error
  *
- *     delete:
- *       tags:
- *          - user
- *       description: Fill database with test random data
- *       responses:
- *         200:
- *           description: Returns a success message.
  */
-router.get('/', userControllerInstance.getAllUser);
-
+router.get('/', userControllerInstance.getAllUser.bind(userControllerInstance));
 
 /**
  * @openapi
@@ -225,8 +217,32 @@ router.get('/', userControllerInstance.getAllUser);
  */
 router.post('/', userControllerInstance.createUser.bind(userControllerInstance));
 
-router.patch('/', userControllerInstance.updateUser);
+router.patch('/', userControllerInstance.updateUser.bind(userControllerInstance));
 
-router.delete('/:id', userControllerInstance.deleteUser);
+/**
+ * @openapi
+ * paths:
+ *   /user/{id}:
+ *     delete:
+ *       tags:
+ *         - user
+ *       summary: Delete a user
+ *       description: Deletes a user by their unique ID.
+ *       parameters:
+ *         - in: path
+ *           name: id
+ *           required: true
+ *           schema:
+ *             type: integer
+ *           description: Unique ID of the user to delete.
+ *       responses:
+ *         200:
+ *           description: User successfully deleted.
+ *         404:
+ *           description: User not found.
+ */
+router.delete('/:id', userControllerInstance.deleteUser.bind(userControllerInstance));
+
+// router.delete('/:id', userControllerInstance.deleteUser.bind(userControllerInstance));
 
 export default router;

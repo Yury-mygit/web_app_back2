@@ -1,5 +1,5 @@
-import PaymentModel, {PayCreationAttributes, PaymentStatus} from "../../payments/payment_model";
-import Payment_model from "../../payments/payment_model";
+import PaymentModel, {PayCreationAttributes, PaymentStatus} from "../payment_model";
+import Payment_model from "../payment_model";
 
 const consume = async (user_id: number) =>{
 

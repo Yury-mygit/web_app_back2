@@ -1,5 +1,5 @@
 import express from 'express';
-import controller from '../controllers/payments/Payment_Contriller'
+import controller from './payments/Payment_Contriller'
 import Validator from './Validator'
 
 export const paymentsRouter = express.Router();

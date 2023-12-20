@@ -17,6 +17,10 @@ import {faker} from "@faker-js/faker";
 import PayHandler from '../database/handlers/PaymentDataHandler'
 import {NextFunction, Request, Response} from "express";
 import Product_model, {ProductAttributes, ProductType} from "../models/product_model";
+import FakeService from './servises/fakeServis'
+
+import AxiosUserCreationStrategy from "./servises/UserCreation/AxiosUserCreationStrategy";
+import FakerUserDataGenerationStrategy from "./servises/DataGeneration/FakerUserDataGenerationStrategy";
 
 const payHandler = new PayHandler
 
@@ -37,9 +41,13 @@ type UserSubset = {
 
 class FakeData_Controller {
 
-    private property1: string;
-    private property2: number;
+
     private dateOfInitialDiagnosis: Date;
+
+    private url = "http://localhost:3002/user"
+    private userCreationStrategy = new AxiosUserCreationStrategy(this.url)
+    private dataGenerationStrategy = new FakerUserDataGenerationStrategy();
+    private fakeService = new FakeService(this.userCreationStrategy,this.dataGenerationStrategy)
 
     services: {
         usersData: (startDate: Date, endDate: Date) => Promise<UserSubset[]>;
@@ -47,9 +55,8 @@ class FakeData_Controller {
 
 
 
-    constructor(property1: string = '', property2: number = 0) {
-        this.property1 = property1;
-        this.property2 = property2;
+    constructor(fakeService: typeof FakeService, property1: string = '', property2: number = 0) {
+
 
         this.services = {
             usersData: this.userDataloader.bind(this)
@@ -271,7 +278,7 @@ class FakeData_Controller {
     fill_data = async (req: Request, res: Response, next: NextFunction) => {
         this.dropData(req).then(()=>
             Promise.all([
-                this.userFill(5),
+                // this.userFill(5),
                 this.employeefill(3),
                 this.officeFill(2),
                 this.productFill()
@@ -289,9 +296,6 @@ class FakeData_Controller {
     //Handlers =============================================================
     private dropData = async (req:any) => {
 
-        this.property1 = req.body.property1;
-        this.property2 = req.body.property2;
-
         try {
             await User_model.sync({force: true})
             await Employee_model.sync({force: true})
@@ -304,34 +308,37 @@ class FakeData_Controller {
             return err || undefined
         }
     }
-    private userFill = async ( number: number) => {
 
-        const t_ids = [733685428, 565047052, 565047052001, 565047052002, 565047052003, 565047052004, 565047052005]
 
+
+
+
+     userFill = async ( req: Request, res: Response, next: NextFunction) => {
+
+         const number = req.body.number;
+         let t_ids = [733685428, 565047052];
+
+         // Generate additional telegram IDs
+         const baseIdLength = t_ids[0].toString().length;
+         for (let i = 2; i < number; i++) {
+             let randomId = faker.number.int({ min: Math.pow(10, baseIdLength), max: Math.pow(10, baseIdLength + 1) - 1 });
+             t_ids.push(randomId);
+         }
         try {
-            for(let i = 0; i < number; i++) {
-                const data :UserCreationAttributes = {
-                    name: faker.person.firstName(),
-                    surname: faker.person.lastName(),
-                    parents: faker.person.firstName(),
-                    age: faker.number.int({min: 3, max: 50}),
-                    status: UserStatus.ACTIVE,
-                    attendance: 0.05,
-                    absences: 0.02,
-                    email: faker.internet.email(),
-                    telephone: faker.phone.number(),
-                    telegram_id: t_ids[i],
-                    issue:'Постановка звука Р',
-                    initial_diagnosis_date: this.dateOfInitialDiagnosis.toISOString(),
-                    address: faker.location.streetAddress()
-                }
-                await User_model.create(data);
+            const result = await this.fakeService.makeUser(number, t_ids)
+            console.log(result)
+            res.json({"message":`Created ${number} users`});
+        } catch (err:any) {
+            console.error(`Error was happen`, err); // Log the full error object for debugging
+            if (!res.headersSent) { // Check if headers have not been sent yet
+                const errorMessage = err.message || 'An error occurred';
+                res.status(500).json({ "message": errorMessage }); // Send only the error message
             }
-            return true;
-        } catch (err) {
-            return err || undefined
         }
     }
+
+
+
 
     private employeefill = async ( number: number) => {
         try {
@@ -641,59 +648,6 @@ class FakeData_Controller {
 
 }
 
-export default new FakeData_Controller()
+export default new FakeData_Controller(FakeService)
 
 
-
-////
-// sessionmaker = async (users_local) => {
-//
-//     const sessions: CustomSessionAttributes[] = [];
-//     let uniqueIndex = 0;
-//     const uniqueTimes = new Set();
-//
-//     users_local.forEach((stud_loc) => {
-//         const session_number: number = this.getRandomElement([1, 2, 3]) || 1;
-//
-//         for (let i = 0; i < session_number; i++) {
-//             const randomEmployee = this.getRandomElement(staff_local);
-//
-//             let randomDay;
-//             let randomHour;
-//             let timeString;
-//
-//             do {
-//                 randomDay = this.getRandomElement2([0,1,2,3,4,5,6]);
-//                 randomHour = this.getRandomElement2([9,10,11,12,13,14,15,16,17,18,18,20]);
-//
-//                 // Create a string that represents the day and hour
-//                 // console.log(`${randomDay}-${randomHour}`)
-//                 timeString = `${randomDay}-${randomHour}`;
-//             } while (uniqueTimes.has(timeString));
-//
-//
-//
-//
-//             if (!randomEmployee) {
-//                 throw new Error('No employee found');
-//             }
-//             const randomOffice = this.getRandomElement(offices_local);
-//             if (!randomOffice) {
-//                 throw new Error('No employee found');
-//             }
-//
-//             sessions.push({
-//                 'index': uniqueIndex,
-//                 'student_id': stud_loc.user_id,
-//                 'employee_id': randomEmployee.staff_id, // Now it's guaranteed not to be undefined
-//                 'student_name': stud_loc.name,
-//                 'office_id':randomOffice.office_id,
-//                 'day':randomDay,
-//                 'time': randomHour,
-//             });
-//             uniqueIndex++;
-//         }
-//     });
-//
-//
-// }

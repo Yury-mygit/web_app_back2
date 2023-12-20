@@ -5,7 +5,7 @@
 import { Request, Response, NextFunction } from 'express';
 import PaymentDataHandler from "../../database/handlers/PaymentDataHandler";
 
-import PaymentModel, {PayAttributes, PayCreationAttributes, PaymentStatus} from "../../payments/payment_model";
+import PaymentModel, {PayAttributes, PayCreationAttributes, PaymentStatus} from "../payment_model";
 import User_model from "../../models/user/user_model";
 import ProductModel from "../../models/product_model";
 import {da} from "@faker-js/faker";

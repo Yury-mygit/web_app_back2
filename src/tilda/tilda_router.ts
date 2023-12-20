@@ -3,7 +3,7 @@ Router for Tilda
  */
 
 import express from 'express';
-import controller from "../../controllers/TildaController" ;
+import controller from "./TildaController" ;
 
 const router = express.Router();
 

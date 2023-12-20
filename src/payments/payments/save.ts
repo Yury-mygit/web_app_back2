@@ -1,5 +1,5 @@
 import { Response } from 'express';
-import PaymentModel, {  PayCreationAttributes ,PaymentStatus} from '../../payments/payment_model'; // Adjust the import path as necessary
+import PaymentModel, {  PayCreationAttributes ,PaymentStatus} from '../payment_model'; // Adjust the import path as necessary
 // import { PaymentStatus } from '../models/payment_status_enum'; // Adjust the import path as necessary
 
 // Curried function

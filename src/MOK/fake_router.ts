@@ -1,14 +1,75 @@
 import express from 'express';
-import fakeData_Controller from "../../MOK/fake_controller";
+import fakeData_Controller from "./fake_controller";
 
 const router = express.Router();
 
 
 
 router.post('/fill', fakeData_Controller.fill_data);
+/**
+ * @openapi
+ * paths:
+ *   /fake/users/fill:
+ *     post:
+ *       tags:
+ *          - Fake routes
+ *       description: Fill database with fake random data
+ *       requestBody:
+ *         required: true
+ *         content:
+ *           application/json:
+ *             schema:
+ *                type: object
+ *                properties:
+ *                 number:
+ *                   type: integer
+ *                   description: The ID of the student to update
+ *                   default: 4
+ *                required:
+ *                 - number
+ *       responses:
+ *         200:
+ *           description: Returns a success message.
+ *       parameters:
+ *         id:
+ *             type: integer
+ *             description: The ID of the session.
+ *
+ */
+router.post('/users/fill', fakeData_Controller.userFill.bind(fakeData_Controller))
 
 router.post('/fill/payments', fakeData_Controller.fill_payments_by_fake_data)
 
+/**
+ * @openapi
+ * paths:
+ *   /fake/check:
+ *     post:
+ *       tags:
+ *          - Fake routes
+ *       description: Fill database with fake random data
+ *       requestBody:
+ *         required: true
+ *         content:
+ *           application/json:
+ *             schema:
+ *                type: object
+ *                properties:
+ *                 number:
+ *                   type: integer
+ *                   description: The ID of the student to update
+ *                   default: 4
+ *                required:
+ *                 - number
+ *       responses:
+ *         200:
+ *           description: Returns a success message.
+ *       parameters:
+ *         id:
+ *             type: integer
+ *             description: The ID of the session.
+ *
+ */
 router.post('/check', fakeData_Controller.check)
 
 export default router;
