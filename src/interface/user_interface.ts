@@ -4,7 +4,7 @@ interface UserAttributes {
     user_id: number;
     name: string;
     surname: string;
-    parents: string;
+    parents?: string;
     age: number;
     status: UserStatus;
     attendance: number;
@@ -13,8 +13,8 @@ interface UserAttributes {
     telephone: string;
     telegram_notification?: boolean;
     telegram_id?: number;
-    issue: string;
-    initial_diagnosis_date: string;
+    issue?: string;
+    initial_diagnosis_date?: Date;
     address: string;
     found_through?: string;
     online?: boolean;

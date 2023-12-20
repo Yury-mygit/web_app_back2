@@ -2,7 +2,7 @@
 *  Is responsible for interacting with the database and storing payment data
 */
 
-import PaymentModel, {PayAttributes, PayCreationAttributes} from "../../payments/payment_model";
+import PaymentModel, {PayAttributes, PayCreationAttributes} from "../../entities/payments/payment_model";
 
 
 class PaymentDataHandler {

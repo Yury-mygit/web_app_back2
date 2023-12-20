@@ -39,7 +39,7 @@ const swaggerOptions = {
     apis: [
         './src/app.ts',
         './src/routers/index_routes.ts',
-        './src/MOK/fake_router.ts',
+        './src/entities/mok/fake_router.ts',
         './src/user/UserRouter.ts',
         './src/routers/routers/office_router.ts',
         './src/routers/routers/product_router.ts',
