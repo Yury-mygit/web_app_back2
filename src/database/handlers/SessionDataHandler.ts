@@ -2,7 +2,7 @@
 *  Is responsible for interacting with the database and storing payment data
 */
 
-import SessionModel from '../../entities/session/session_model'
+import SessionModel from '../../subject/session/session_model'
 import SessionAttributes,{PartialSessionAttributes} from "../../interface/session_interfases";
 
 class SessionDataHandler {

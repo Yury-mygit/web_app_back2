@@ -39,14 +39,14 @@ const swaggerOptions = {
     apis: [
         './src/app.ts',
         './src/routers/index_routes.ts',
-        './src/entities/mok/fake_router.ts',
-        './src/user/UserRouter.ts',
-        './src/routers/routers/office_router.ts',
-        './src/routers/routers/product_router.ts',
-        './src/routers/routers/session_router.ts',
-        './src/routers/routers/payment_router.ts',
-        './src/routers/routers/employee_router.ts',
-        './src/routers/routers/tilda_router.ts'
+        './src/mok/fake_router.ts',
+        './src/subject/user/UserRouter.ts',
+        './src/subject/office/office_router.ts',
+        './src/subject/product/product_router.ts',
+        './src/subject/session/session_router.ts',
+        './src/subject/payments/payment_router.ts',
+        './src/subject/staff/employee_router.ts',
+        './src/tilda/tilda_router.ts'
     ],
 };
 const swaggerDocs = swaggerJsDoc(swaggerOptions);

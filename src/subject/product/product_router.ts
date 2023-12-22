@@ -12,8 +12,8 @@ const router = express.Router();
  *     get:
  *       tags:
  *         - Product
- *       summary: The api for gathering products
- *       description: The api for gathering products
+ *       summary: The api.ts for gathering products
+ *       description: The api.ts for gathering products
  *       parameters:
  *         - name: skip
  *           in: query

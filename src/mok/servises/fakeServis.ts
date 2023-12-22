@@ -3,6 +3,7 @@ import IDataGenerationStrategy from "./DataGeneration/IDataGenerationStrategy";
 import { validate, ValidationError } from 'class-validator';
 
 import UserResponse from "./validate";
+import UserAttributes from "../../subject/user/user_interface";
 
 class FakeService {
     private userCreationStrategy: IUserCreationStrategy;
@@ -21,23 +22,14 @@ class FakeService {
 
         for (let i = 0; i < userCount; i++) {
             const data = this.dataGenerationStrategy.generateUserData(telegramIds[i]);
-            // console.log(data)
-            const responseData = new UserResponse(data);
-            // console.log(responseData)
+            // console.log("data = " , data)
+            const responseData : Partial<UserAttributes> = new UserResponse(data as Partial<UserAttributes>);
 
-            // Object.assign(responseData, await this.userCreationStrategy.createUser(responseData));
 
-            const errors = await validate(responseData);
-            if (errors.length > 0) {
-                validationErrors.push(...errors); // Collect all validation errors
-            }
+            // console.log("responseData=",responseData)
+            Object.assign(responseData, await this.userCreationStrategy.createUser(responseData as Partial<UserAttributes>));
+
         }
-
-        if (validationErrors.length > 0) {
-            console.error('Validation errors:', validationErrors);
-            throw new Error(`Validation failed for one or more users.`);
-        }
-
         return 'ok';
     }
 }

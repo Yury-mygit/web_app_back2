@@ -6,7 +6,7 @@ const router = express.Router();
 /**
  * @openapi
  * paths:
- *   /user:
+ *   /user/getall:
  *     get:
  *       tags:
  *         - user
@@ -37,48 +37,39 @@ const router = express.Router();
  *       responses:
  *         '200':
  *           description: Successful operation
- *
- *     patch:
+ */
+router.get('/getall', userControllerInstance.getAllUser.bind(userControllerInstance));
+
+/**
+ * @openapi
+ * paths:
+ *   /user/getone:
+ *     post:
  *       tags:
  *         - user
- *       summary: Update
+ *       summary: Your route summary
+ *       description: Your route description
  *       requestBody:
  *         required: true
  *         content:
  *           application/json:
- *             schema:
- *               type: object
+ *            schema:
+ *               oneOf:
+ *                 - required: [user_id]
+ *                   properties:
+ *                     user_id:
+ *                       type: string
+ *                 - required: [telegram_id]
+ *                   properties:
+ *                     telegram_id:
+ *                       type: string
  *               properties:
- *                 firstName:
+ *                 user_id:
  *                   type: string
- *                 lastName:
+ *                   default: Иван
+ *                 telegram_id:
  *                   type: string
- *                 parentsName:
- *                   type: string
- *                 age:
- *                   type: integer
- *                 status:
- *                   type: string
- *
- *                 sessionTransferRate:
- *                   type: integer
- *                 percentageOfAbsences:
- *                   type: number
- *                 contactEmail:
- *                   type: string
- *                 contactTelephone:
- *                   type: string
- *                 allowTelegramNotification:
- *                   type: boolean
- *                 address:
- *                   type: string
- *                 foundUsThrough:
- *                   type: string
- *                 online:
- *                   type: boolean
- *                 notes:
- *                   type: string
- *
+ *                   default: Иванов
  *
  *       responses:
  *         '200':
@@ -115,14 +106,13 @@ const router = express.Router();
  *                     errorCode:
  *                       type: integer
  *                       description: Custom error code indicating the specific error
- *
  */
-router.get('/', userControllerInstance.getAllUser.bind(userControllerInstance));
+router.post('/getone', userControllerInstance.getOneUser.bind(userControllerInstance));
 
 /**
  * @openapi
  * paths:
- *   /user:
+ *   /user/create:
  *     post:
  *       tags:
  *         - user
@@ -179,6 +169,94 @@ router.get('/', userControllerInstance.getAllUser.bind(userControllerInstance));
  *
  *
  *       responses:
+ *         '201':
+ *           description: Successful operation
+ *           content:
+ *             application/json:
+ *               schema:
+ *                 type: object
+ *                 properties:
+ *                   user_id:
+ *                     type: integer
+ *
+ *           '400':
+ *             description: Bad request
+ *             content:
+ *               application/json:
+ *                 schema:
+ *                   type: object
+ *                   properties:
+ *                     error:
+ *                       type: string
+ *                     errorCode:
+ *                       type: integer
+ *                       description: Custom error code indicating the specific error
+ *           '500':
+ *             description: Internal server error
+ *             content:
+ *               application/json:
+ *                 schema:
+ *                   type: object
+ *                   properties:
+ *                     error:
+ *                       type: string
+ *                     errorCode:
+ *                       type: integer
+ *                       description: Custom error code indicating the specific error
+ */
+router.post('/create', userControllerInstance.createUser.bind(userControllerInstance));
+
+/**
+ * @openapi
+ * paths:
+ *   /user/update:
+ *     patch:
+ *       tags:
+ *         - user
+ *       summary: Update
+ *       requestBody:
+ *         required: true
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 name:
+ *                   type: string
+ *                   default: Дима
+ *                 surname:
+ *                   type: string
+ *                   default: Дмитриевич
+ *                 parents:
+ *                   type: string
+ *                   default: Артур
+ *                 age:
+ *                   type: integer
+ *                   default: 5
+ *                 status:
+ *                   type: string
+ *                   default: active
+ *                 attendance:
+ *                   type: integer
+ *                   default: 0.01
+ *                 absences:
+ *                   type: number
+ *                   default: 0.01
+ *                 email:
+ *                   type: string
+ *                   default: dima@yandex.ru
+ *                 telephone:
+ *                   type: string
+ *                   default: +8739388384
+ *                 online:
+ *                   type: boolean
+ *                   default: true
+ *                 notes:
+ *                   type: string
+ *                   default: true
+ *
+ *
+ *       responses:
  *         '200':
  *           description: Successful operation
  *           content:
@@ -213,16 +291,14 @@ router.get('/', userControllerInstance.getAllUser.bind(userControllerInstance));
  *                     errorCode:
  *                       type: integer
  *                       description: Custom error code indicating the specific error
-
+ *
  */
-router.post('/', userControllerInstance.createUser.bind(userControllerInstance));
-
-router.patch('/', userControllerInstance.updateUser.bind(userControllerInstance));
+router.patch('/update', userControllerInstance.updateUser.bind(userControllerInstance));
 
 /**
  * @openapi
  * paths:
- *   /user/{id}:
+ *   /user/delete.{id}:
  *     delete:
  *       tags:
  *         - user
@@ -241,8 +317,8 @@ router.patch('/', userControllerInstance.updateUser.bind(userControllerInstance)
  *         404:
  *           description: User not found.
  */
-router.delete('/:id', userControllerInstance.deleteUser.bind(userControllerInstance));
+router.delete('/delete/:id', userControllerInstance.deleteUser.bind(userControllerInstance));
 
-// router.delete('/:id', userControllerInstance.deleteUser.bind(userControllerInstance));
+
 
 export default router;

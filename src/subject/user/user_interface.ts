@@ -14,7 +14,7 @@ interface UserAttributes {
     telegram_notification?: boolean;
     telegram_id?: number;
     issue?: string;
-    initial_diagnosis_date?: Date;
+    initial_diagnosis_date?: string;
     address: string;
     found_through?: string;
     online?: boolean;
@@ -31,5 +31,5 @@ export enum UserStatus {
 
 export default UserAttributes
 
-// export interface UserCreationAttributes extends Optional<UserAttributes, 'user_id' | 'updatedAt' | 'createdAt'>{}
+// export interface UserAddAttributes extends Optional<UserAttributes, 'user_id' | 'updatedAt' | 'createdAt'>{}
 export interface UserCreationAttributes extends Partial<UserAttributes> {}

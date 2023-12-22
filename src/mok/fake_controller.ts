@@ -2,21 +2,21 @@
 Controller that fill db with fake data. Pay attention! Db will drop and fill with new fake data
 */
 import {Model, Op} from 'sequelize'; // Make sure to import Model from sequelize
-import User_model from "../user/user_model";
-import UserAttributes, {UserCreationAttributes, UserStatus} from "../../interface/user_interface"
-import SessionAttributes, {PartialSessionAttributes} from "../../interface/session_interfases";
+import User_model from "../subject/user/user_model";
+import UserAttributes, {UserCreationAttributes, UserStatus} from "../subject/user/user_interface"
+import SessionAttributes, {PartialSessionAttributes} from "../interface/session_interfases";
 
-import Session_model, {ServiceType, Status} from "../session/session_model";
-import Office_model, {OfficeAttributes} from "../office/office_model";
-import Employee_model, {StaffAttributes} from "../staff/employee_model";
-import Payment_model from "../payments/payment_model";
-import payment_model, {PayCreationAttributes, PaymentStatus} from "../payments/payment_model";
+import Session_model, {ServiceType, Status} from "../subject/session/session_model";
+import Office_model, {OfficeAttributes} from "../subject/office/office_model";
+import Employee_model, {StaffAttributes} from "../subject/staff/employee_model";
+import Payment_model from "../subject/payments/payment_model";
+import payment_model, {PayCreationAttributes, PaymentStatus} from "../subject/payments/payment_model";
 
 import {faker} from "@faker-js/faker";
 
-import PayHandler from '../../database/handlers/PaymentDataHandler'
+import PayHandler from '../database/handlers/PaymentDataHandler'
 import {NextFunction, Request, Response} from "express";
-import Product_model, {ProductAttributes, ProductType} from "../product/product_model";
+import Product_model, {ProductAttributes, ProductType} from "../subject/product/product_model";
 import FakeService from './servises/fakeServis'
 
 import AxiosUserCreationStrategy from "./servises/UserCreation/AxiosUserCreationStrategy";
@@ -44,7 +44,7 @@ class FakeData_Controller {
 
     private dateOfInitialDiagnosis: Date;
 
-    private url = "http://localhost:3002/user"
+    private url = "http://localhost:3002/user/create"
     private userCreationStrategy = new AxiosUserCreationStrategy(this.url)
     private dataGenerationStrategy = new FakerUserDataGenerationStrategy();
     private fakeService = new FakeService(this.userCreationStrategy,this.dataGenerationStrategy)
@@ -326,7 +326,7 @@ class FakeData_Controller {
 
         try {
             const result = await this.fakeService.makeUser(number, t_ids)
-            // console.log(result)
+            console.log(result)
             res.json({"message":`Created ${number} users`});
         } catch (err:any) {
             // console.error(`Error was happen`, err); // Log the full error object for debugging

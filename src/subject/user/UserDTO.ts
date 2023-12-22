@@ -1,63 +1,59 @@
-import { IsNotEmpty, IsEmail, IsInt, Min, Max, IsOptional } from 'class-validator';
-import {UserStatus} from "../../interface/user_interface";
+import {IsNotEmpty, IsEmail, IsInt, IsNumber, Min, Max, IsOptional, IsDate, IsString} from 'class-validator';
+import UserAttributes, {UserStatus} from "./user_interface";
 
 export class CreateUserDTO {
 
-    constructor(payload:{
-                name: string,
-                surname: string,
-                parentsName: string,
-                age: number,
-                contactEmail: string,
-                contactTelephone:string,
-                dateOfInitialDiagnosis: Date,
-                address: string,
-                status: UserStatus,
-                attendance?: number
-                }
+    constructor(payload: Partial<UserAttributes>
 
     ) {
         this.name = payload.name;
         this.surname = payload.surname;
-        this.parentsName = payload.parentsName;
+        this.parents = payload.parents;
         this.age = payload.age;
-        this.contactEmail = payload.contactEmail;
-        this.contactTelephone = payload.contactTelephone;
-        this.dateOfInitialDiagnosis = payload.dateOfInitialDiagnosis;
+        this.email = payload.email;
+        this.telephone = payload.telephone;
+        this.initial_diagnosis_date = payload.initial_diagnosis_date;
         this.address = payload.address;
-        this.status = payload.status
+        this.status = payload.status;
+        this.attendance = payload.attendance
+        this.absences = payload.absences
     }
 
     @IsNotEmpty()
-    name: string;
+    name?: string;
 
     @IsNotEmpty()
-    surname: string;
+    surname?: string;
 
     @IsNotEmpty()
-    parentsName: string;
+    parents?: string;
 
     @IsInt()
     @Min(0)
-    age: number;
+    age?: number;
 
     @IsEmail()
-    contactEmail: string;
+    email?: string;
 
     @IsNotEmpty()
-    contactTelephone: string;
+    telephone?: string;
+
+    @IsString()
+    initial_diagnosis_date?: string;
 
     @IsNotEmpty()
-    dateOfInitialDiagnosis: Date;
+    address?: string;
 
     @IsNotEmpty()
-    address: string;
+    status?: UserStatus;
 
-    @IsNotEmpty()
-    status: string;
-
+    @IsNumber()
     @IsOptional()
     attendance?: number;
+
+    @IsNumber()
+    @IsOptional()
+    absences?: number;
 }
 
 

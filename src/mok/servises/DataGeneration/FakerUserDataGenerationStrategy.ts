@@ -1,6 +1,6 @@
 import {faker} from "@faker-js/faker";
 import IDataGenerationStrategy from "./IDataGenerationStrategy";
-import {UserCreationAttributes, UserStatus} from "../../../../interface/user_interface";
+import {UserCreationAttributes, UserStatus} from "../../../subject/user/user_interface";
 
 class FakerUserDataGenerationStrategy implements IDataGenerationStrategy {
     generateUserData(telegramId: number): UserCreationAttributes {
@@ -17,10 +17,10 @@ class FakerUserDataGenerationStrategy implements IDataGenerationStrategy {
             attendance: 0.05,
             absences: 0.02,
             email: faker.internet.email(),
-            telephone: faker.phone.number(),
+            telephone: faker.phone.number().toString(),
             telegram_id: telegramId,
             issue:'Постановка звука Р',
-            initial_diagnosis_date: initial_diagnosis_date,
+            initial_diagnosis_date: initial_diagnosis_date.toISOString(),
             address: faker.location.streetAddress()
         };
     }

@@ -1,6 +1,6 @@
 import { Sequelize, Table, Column, Model, DataType,  CreatedAt, UpdatedAt, AutoIncrement, PrimaryKey, AllowNull, Unique, Default } from 'sequelize-typescript';
 import { sequelize } from '../../database/database';
-import {UserStatus} from "../../interface/user_interface";
+import {UserStatus} from "./user_interface";
 
 @Table({ tableName: 'users' })
 export class User_model extends Model {

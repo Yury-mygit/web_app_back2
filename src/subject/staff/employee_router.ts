@@ -27,8 +27,8 @@ interface response_int{
  *     get:
  *       tags:
  *         - Employee
- *       summary: The api for gathering offices
- *       description: The api for gathering offices
+ *       summary: The api.ts for gathering offices
+ *       description: The api.ts for gathering offices
  *       parameters:
  *         - name: skip
  *           in: query

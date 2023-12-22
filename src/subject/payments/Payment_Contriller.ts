@@ -3,18 +3,18 @@
 */
 
 import { Request, Response, NextFunction } from 'express';
-import PaymentDataHandler from "../../../database/handlers/PaymentDataHandler";
+import PaymentDataHandler from "../../database/handlers/PaymentDataHandler";
 
-import PaymentModel, {PayAttributes, PayCreationAttributes, PaymentStatus} from "../payment_model";
-import User_model from "../../user/user_model";
-import ProductModel from "../../product/product_model";
+import PaymentModel, {PayAttributes, PayCreationAttributes, PaymentStatus} from "./payment_model";
+import User_model from "../user/user_model";
+import ProductModel from "../product/product_model";
 import {da} from "@faker-js/faker";
 import {Op} from "sequelize";
-import save from "./save";
-import req_validate_and_configure_input_data from "./validate_input_data";
-import validate_input_data from "./validate_input_data";
+import save from "./payments/save";
+import req_validate_and_configure_input_data from "./payments/validate_input_data";
+import validate_input_data from "./payments/validate_input_data";
 import {consumers} from "stream";
-import consume from "./consume";
+import consume from "./payments/consume";
 
 // type UserInput = {
 //     user_id: number;

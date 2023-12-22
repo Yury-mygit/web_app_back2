@@ -1,16 +1,19 @@
 import User_model from "./user_model";
-import UserAttributes from "../../interface/user_interface";
+import UserAttributes from "./user_interface";
 import { Request, Response } from 'express';
 import UserService from './UserService';
 import { CreateUserDTO, UpdateUserDTO } from './UserDTO';
+import API from "../../servises/api";
+import {th} from "@faker-js/faker";
 
 type PartialUserAttributes = Pick<UserAttributes, 'user_id' | 'name' | 'surname' | 'telegram_id'>;
 
 class UserController {
     private userService= UserService;
-
-    constructor(userService: typeof UserService) { // Inject userService through the constructor
+    private api = API
+    constructor(userService: typeof UserService, api:typeof API) { // Inject userService through the constructor
         this.userService = userService;
+        this.api = api;
     }
     async getAllUser(req: Request, res: Response) {
         try {
@@ -23,21 +26,20 @@ class UserController {
         }
     }
 
-    async createUser(req: Request, res: Response) {
-        // console.log("====================================================")
-        // console.log(req)
+    async getOneUser(req: Request,  res: Response) {
+        res.json(await this.userService.getOneUser(req.body as Partial<UserAttributes>))
+    }
+
+     // createUser = async (req: Request, res: Response) =>
+     //     this.api.success(res, this.userService.createUser({ ...req.body as Partial<UserAttributes>}))
+
+    createUser = async (req: Request, res: Response) =>{
         try {
-            const createStudentDTO = new CreateUserDTO({
-                ...req.body,
-                dateOfInitialDiagnosis: Date.now()
-            });
-            // console.log(createStudentDTO)
-            const user = await this.userService.createUser(createStudentDTO)
-            res.status(201).json(user);
-        } catch (error: any) {
-            // console.log("Error in createUser: ", error)
-            res.status(500).json({ error: error.message });
+            await this.api.success(res, this.userService.createUser({...req.body as Partial<UserAttributes>}))
+        }catch (e){
+            await this.api.error(res, e)
         }
+
     }
 
     async updateUser(req: Request, res: Response) {
@@ -63,7 +65,7 @@ class UserController {
 }
 
 
-export default new UserController(UserService);
+export default new UserController(UserService, API);
 
 
 
