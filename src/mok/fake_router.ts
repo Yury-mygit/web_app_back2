@@ -1,12 +1,28 @@
 import express from 'express';
-import fakeData_Controller from "./fake_controller";
+import FakeDataController from "./fake_controller";
+import Executor from "./servises/executor";
+import Service from "./servises/service";
+import Store from "../servises/store";
+import AxiosUserCreationStrategy from "./servises/UserCreation/AxiosUserCreationStrategy";
+import FakerUserDataGenerationStrategy from "./servises/DataGeneration/FakerUserDataGenerationStrategy";
 
 const router = express.Router();
 
+const fakeDataController = new FakeDataController(
+    new Executor(
+        new AxiosUserCreationStrategy("http://localhost:3002/user/create"),
+        new FakerUserDataGenerationStrategy()
+    ),
+    new Service(
+        new FakerUserDataGenerationStrategy()
+    ),
+    new Store()
+)
 
 
-router.post('/fill', fakeData_Controller.fill_data);
+router.post('/fill', fakeDataController.fill_data);
 
+router.post('/users/fill', fakeDataController.userFill.bind(fakeDataController))
 /**
  * @openapi
  * paths:
@@ -37,9 +53,8 @@ router.post('/fill', fakeData_Controller.fill_data);
  *             description: The ID of the session.
  *
  */
-router.post('/users/fill', fakeData_Controller.userFill.bind(fakeData_Controller))
 
-router.post('/fill/payments', fakeData_Controller.fill_payments_by_fake_data)
+router.post('/fill/payments', fakeDataController.fill_payments_by_fake_data)
 
 /**
  * @openapi
@@ -71,7 +86,7 @@ router.post('/fill/payments', fakeData_Controller.fill_payments_by_fake_data)
  *             description: The ID of the session.
  *
  */
-router.post('/check', fakeData_Controller.check)
+router.post('/check', fakeDataController.check)
 
 export default router;
 

@@ -64,10 +64,11 @@ app.use((req: express.Request, res: express.Response, next: express.NextFunction
     next();
 });
 app.use((err: SyntaxErrorWithStatus, req: express.Request, res: express.Response, next: express.NextFunction) => {
-    console.log(err); // Log all errors
+    // console.log(err); // Log all errors
 
     if (err.status === 400 && 'body' in err) {
         return res.status(400).send({ message: "Invalid JSON", error: err.message }); // Include error message
+
     }
 
     next();
@@ -81,8 +82,6 @@ app.use(bodyParser.json()); // for parsing application/json
 app.use(bodyParser.urlencoded({ extended: true })); // for parsing application/x-www-form-urlencoded
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocs));
 
-
-//!!!!!!!!!!!
 app.get('/api-docs/swagger-ui.css', (req, res) => {
     res.sendFile(path.join(__dirname, './swa_static/custom-swagger-ui.css'));
 });
@@ -98,7 +97,8 @@ const runServer = async () =>{
     try {
         await sequelize.sync().then(()=>console.log('Models synced successfully.'));
         app.listen(port, () => {
-            console.log(`Server is running at http://localhost:${port}`);
+            // console.log(`Server is running at http://localhost:${port}`);
+            // Log(`Server is running at http://localhost:${port}`)
         });
     }catch (e){
         console.log(e)

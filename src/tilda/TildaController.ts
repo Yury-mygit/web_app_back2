@@ -9,6 +9,8 @@ class TildaController {
     tildaWebhook = async (req:any, res:any, next:any) => {
         const payload = req.body;
 
+        console.log('Tilda')
+
         fs.appendFile('webhook-data.txt', JSON.stringify(payload) + "\n", (err) => {
             if (err) {
                 console.error(err);

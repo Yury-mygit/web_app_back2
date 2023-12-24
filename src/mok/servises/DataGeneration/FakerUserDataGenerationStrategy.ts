@@ -5,9 +5,7 @@ import {UserCreationAttributes, UserStatus} from "../../../subject/user/user_int
 class FakerUserDataGenerationStrategy implements IDataGenerationStrategy {
     generateUserData(telegramId: number): UserCreationAttributes {
 
-        // console.log(new Date(Date.now() - 7 * 24 * 60 * 60 * 1000))
         const initial_diagnosis_date = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000)
-        // console.log(typeof initial_diagnosis_date)
         return {
             name: faker.person.firstName(),
             surname: faker.person.lastName(),

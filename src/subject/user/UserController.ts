@@ -1,19 +1,54 @@
-import User_model from "./user_model";
 import UserAttributes from "./user_interface";
 import { Request, Response } from 'express';
 import UserService from './UserService';
 import { CreateUserDTO, UpdateUserDTO } from './UserDTO';
-import API from "../../servises/api";
-import {th} from "@faker-js/faker";
+import API_, {APIResponse, IAPI} from "../../servises/api";
+import Log, {run} from "../../servises/debug";
+import {IStore} from "../../servises/store";
 
-type PartialUserAttributes = Pick<UserAttributes, 'user_id' | 'name' | 'surname' | 'telegram_id'>;
+// const API = new API_(new APIResponse())
 
-class UserController {
-    private userService= UserService;
-    private api = API
-    constructor(userService: typeof UserService, api:typeof API) { // Inject userService through the constructor
+export interface IUserController{
+    getAllUser(req: Request, res: Response):void
+    getOneUser(req: Request,  res: Response):void
+    createUser(req: Request, res: Response):void
+    updateUser(req: Request, res: Response):void
+    deleteUser(req: Request, res: Response):void
+}
+
+export interface IUserService{
+    getAllUsers(skip: number, limit: number):Promise<Partial<UserAttributes>[]>
+    getOneUser(payload: Partial<UserAttributes>):Promise<Partial<UserAttributes>>
+    createUser(data:string, target:string):void
+    updateUser(updateStudentDTO: UpdateUserDTO):Promise<void>
+    deleteUser(userId: number):Promise<void>
+
+    configureStore(ws:IStore):void
+}
+
+export interface IUserWorkspace {
+    setData(key: string, data: any):void;
+    getData(key: string):any;
+    getAllKeys():string[];
+    setMultipleData(keyValuePairs: Record<string, any>): void;
+}
+
+class UserController implements IUserController{
+    private userService:IUserService;
+    private api: IAPI
+    private store: IStore
+
+    constructor({ userService, api , store}: { userService: IUserService, api: IAPI , store: IStore}) {
         this.userService = userService;
         this.api = api;
+        this.store = store
+
+        this.userService.configureStore(this.store)
+        this.store.subscribe((key, oldValue, newValue) => {
+            // console.log(`Change detected for key "${key}": from`, oldValue, 'to', newValue);
+            // Perform any asynchronous action here
+            if (key == 'status') console.log(key, "  ", newValue)
+        });
     }
     async getAllUser(req: Request, res: Response) {
         try {
@@ -30,16 +65,27 @@ class UserController {
         res.json(await this.userService.getOneUser(req.body as Partial<UserAttributes>))
     }
 
-     // createUser = async (req: Request, res: Response) =>
-     //     this.api.success(res, this.userService.createUser({ ...req.body as Partial<UserAttributes>}))
-
     createUser = async (req: Request, res: Response) =>{
-        try {
-            await this.api.success(res, this.userService.createUser({...req.body as Partial<UserAttributes>}))
-        }catch (e){
-            await this.api.error(res, e)
-        }
 
+        /*
+        1. Initialize to store for this request and save data
+        2. Save to database
+        3. maker response
+         */
+
+        const payload:Partial<UserAttributes> = req.body
+
+        this.store.setMultipleData({"res":res, 'data':payload, 'result':{}})
+        this.userService.createUser('data', "result")
+        this.api.success("res",'sd')
+        // await run(this.userService.createUser, this.userService, 'data', "result")
+
+
+        // try {
+        //     await this.api.success(res, this.userService.createUser({...req.body as Partial<UserAttributes>}))
+        // }catch (e){
+        //     await this.api.error(res, e)
+        // }
     }
 
     async updateUser(req: Request, res: Response) {
@@ -61,115 +107,7 @@ class UserController {
             res.status(500).json({ error: error.message });
         }
     }
-
 }
 
 
-export default new UserController(UserService, API);
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-// class UserController {
-//     async getAllStudents(req:any, res:any, next:any){
-//         try {
-//             const skip = parseInt(req.query.skip as string) || 0;
-//             const limit = parseInt(req.query.limit as string) || 100;
-//             const user_id = parseInt(req.query.user_id as string) || -1;
-//
-//             const fields: (keyof PartialUserAttributes)[] = ['user_id', 'name', 'surname', 'telegram_id'];
-//
-//             const students = await User_model.findAll({
-//                 offset: skip,
-//                 limit: limit,
-//                 order:['user_id'],
-//                 attributes: fields
-//             });
-//
-//             res.json(students);
-//         } catch (err) {
-//             if (err instanceof Error) {
-//                 res.status(500).json({ error: err.message });
-//             } else {
-//                 res.status(500).json({ error: 'An unknown error occurred' });
-//             }
-//         }
-//     }
-//
-//     async createStudent(req:any, res:any, next:any){
-//         const tempdata = {
-//             firstName: req.body.firstName,
-//             lastName: req.body.lastName,
-//             parentsName: req.body.firstName,
-//             age: req.body.age,
-//             status: 'active',
-//             sessionTransferRate: 0.05,
-//             percentageOfAbsences: 0.02,
-//             contactEmail: req.body.contactEmail,
-//             contactTelephone: req.body.contactTelephone,
-//             dateOfInitialDiagnosis: req.body.dateOfInitialDiagnosis,
-//             address: req.body.address
-//         }
-//
-//         try {
-//             const studentData = req.body;
-//             const student = await User_model.create(tempdata);
-//             res.json(student.id);
-//         } catch (err: any) {
-//             res.status(500).json(err)
-//         }
-//     }
-//
-//     async updateStudent(req:any, res:any, next:any){
-//         const tempdata = {
-//
-//             firstName: req.body.firstName,
-//             lastName: req.body.lastName,
-//             parentsName: req.body.firstName,
-//             age: req.body.age,
-//             status: 'active',
-//             sessionTransferRate: 0.05,
-//             percentageOfAbsences: 0.02,
-//             contactEmail: req.body.contactEmail,
-//             contactTelephone: req.body.contactTelephone,
-//             dateOfInitialDiagnosis: req.body.dateOfInitialDiagnosis,
-//             address: req.body.address
-//         }
-//
-//         try {
-//             const studentId = req.body.id;
-//             await User_model.update(tempdata, { where: { id: studentId } });
-//             res.json({ message: 'User_model updated successfully' });
-//         } catch (err: any) {
-//             res.status(500).json(err)
-//         }
-//     }
-//
-//     async deleteStudent(req:any, res:any, next:any){
-//         try {
-//             const studentId = req.params.id;
-//             await User_model.destroy({ where: { id: studentId } });
-//             res.json({ message: 'User_model deleted successfully' });
-//         } catch (err: any) {
-//             res.status(500).json(err)
-//         }
-//     }
-// }
-
+export default UserController;

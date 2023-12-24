@@ -17,12 +17,8 @@ import {faker} from "@faker-js/faker";
 import PayHandler from '../database/handlers/PaymentDataHandler'
 import {NextFunction, Request, Response} from "express";
 import Product_model, {ProductAttributes, ProductType} from "../subject/product/product_model";
-import FakeService from './servises/fakeServis'
 
-import AxiosUserCreationStrategy from "./servises/UserCreation/AxiosUserCreationStrategy";
-import FakerUserDataGenerationStrategy from "./servises/DataGeneration/FakerUserDataGenerationStrategy";
 
-const payHandler = new PayHandler
 
 type CustomSessionAttributes = Partial<SessionAttributes> & {
     student_name?:string;
@@ -39,37 +35,53 @@ type UserSubset = {
 
 
 
-class FakeData_Controller {
+
+export interface IRequestStrategy {
+    setRequestStrategy(requestStrategy:IRequestStrategy): void,
+}
+export interface IExecutor {
+    makeUser(resultTarget:string, response:string, ids:string): void;
+    connectWorkspace(ws:any):void
+    makeres( resultTarget:string, response:string, ): void
+}
+
+export interface IService {
+    getUserIdList(userCount: number, flag:string):number[],
+    connectWorkspace(ws:any):void
+}
+
+export interface IWorkspace {
+    setData(key: string, data: any):void;
+    getData(key: string):any;
+    getAllKeys():string[];
+    setMultipleData(keyValuePairs: Record<string, any>): void;
+}
 
 
+
+class FakeDataController {
     private dateOfInitialDiagnosis: Date;
-
-    private url = "http://localhost:3002/user/create"
-    private userCreationStrategy = new AxiosUserCreationStrategy(this.url)
-    private dataGenerationStrategy = new FakerUserDataGenerationStrategy();
-    private fakeService = new FakeService(this.userCreationStrategy,this.dataGenerationStrategy)
-
-    services: {
-        usersData: (startDate: Date, endDate: Date) => Promise<UserSubset[]>;
-    };
+    private t_ids = [733685428, 565047052];
 
 
+    private executor: IExecutor
+    private service: IService
+    private workspace: IWorkspace
 
-    constructor(fakeService: typeof FakeService, property1: string = '', property2: number = 0) {
-
-
-        this.services = {
-            usersData: this.userDataloader.bind(this)
-        };
-
+    constructor(executor: IExecutor, service: IService, workspace: IWorkspace) {
         this.dateOfInitialDiagnosis = new Date()
         this.dateOfInitialDiagnosis.setDate(this.dateOfInitialDiagnosis.getDate() - 13);
+        this.executor = executor
+        this.service = service
+        this.workspace = workspace
+
+        this.service.connectWorkspace(this.workspace)
+        this.executor.connectWorkspace(this.workspace)
     }
 
-    // Routers Handlers ================================
+
     check = async (req: Request, res: Response, next: NextFunction) => {
         try {
-            console.log(req.body);
 
             const productType = req.body.product_type as ProductType;
 
@@ -108,12 +120,6 @@ class FakeData_Controller {
         return true;
     };
 
-
-
-
-
-
-
     fill_payments_by_fake_data = async (req: Request, res: Response, next: NextFunction) => {
 
         try {
@@ -139,27 +145,8 @@ class FakeData_Controller {
 
         if ( !session ) throw new Error("There is no session")
 
-        console.log("================START===========================")
+        // console.log("================START===========================")
         for (const ses of session) {
-            console.log(" ")
-
-
-            // NEW ===
-            // try{
-            //     const  pay = await Payment_model.findOne({ where: {
-            //             user_id: ses.user_id,
-            //             status: PaymentStatus.NEW
-            //            }})
-            //     if (pay != undefined){
-            //         // console.log(pay.product_type, '  ', pay.spend)
-            //     }
-            //     // console.log('in new',pay?.product_type)
-            // }catch (err){
-            //
-            // }
-
-
-            // ACTIVE ============
             try{
                 const  pay = await Payment_model.findOne({ where: {
                         user_id: ses.user_id,
@@ -175,8 +162,8 @@ class FakeData_Controller {
                 if (!product) throw new Error( "Error there is no product")
 
                 if(pay) {
-                    console.log('Payment is found! id=', pay.pay_id, 'for user' ,ses.user_id,'spended', pay.spend)
-                    console.log(product)
+                    // console.log('Payment is found! id=', pay.pay_id, 'for user' ,ses.user_id,'spended', pay.spend)
+                    // console.log(product)
                     if (parseInt(product?.product_type) > pay?.spend) {
                         const payload: PayCreationAttributes = {
                             user_id: ses.user_id,
@@ -208,7 +195,7 @@ class FakeData_Controller {
                 }
 
             }catch (err){
-                console.log(err)
+                console.log('Error', err)
             }
 
 
@@ -260,20 +247,9 @@ class FakeData_Controller {
 
         }
 
-        console.log("================END===========================")
-        //======================================
-
-
-
-
-
 
         res.json({"Status":"ok"} )
     }
-
-
-
-
 
     fill_data = async (req: Request, res: Response, next: NextFunction) => {
         this.dropData(req).then(()=>
@@ -284,7 +260,7 @@ class FakeData_Controller {
                 this.productFill()
             ]))
             .then(()=>this.sessionFill())
-            .then(()=>this.createPayments())
+            // .then(()=>this.createPayments())
             .then(() => {
                 res.status(200).json({ status: 'ok', desk: 'All good!!!' });
             })
@@ -293,7 +269,7 @@ class FakeData_Controller {
             });
     }
 
-    //Handlers =============================================================
+
     private dropData = async (req:any) => {
 
         try {
@@ -310,34 +286,21 @@ class FakeData_Controller {
     }
 
 
-
-
-
+       /*  description
+           1. Save data to workspace
+           2. ask service.getUserIdList to makr a list
+           3. ask executor.saveUser to save user to db
+           4. If still no error ask respondent to make a response
+       */
      userFill = async ( req: Request, res: Response, next: NextFunction) => {
 
-         const number = req.body.number;
-         let t_ids = [733685428, 565047052];
-         const baseIdLength = t_ids[0].toString().length;
+        this.workspace.setMultipleData({"res":res, "number": req.body.number, "ids":this.t_ids, 'result':{}})
 
-         for (let i = 2; i < number; i++) {
-             let randomId = faker.number.int({ min: Math.pow(10, baseIdLength), max: Math.pow(10, baseIdLength + 1) - 1 });
-             t_ids.push(randomId);
-         }
+        this.service.getUserIdList(req.body.number, "ids")
+        this.executor.makeUser('result',"res","ids")
+        this.executor.makeres('result',"res",)
 
-        try {
-            const result = await this.fakeService.makeUser(number, t_ids)
-            console.log(result)
-            res.json({"message":`Created ${number} users`});
-        } catch (err:any) {
-            // console.error(`Error was happen`, err); // Log the full error object for debugging
-            if (!res.headersSent) { // Check if headers have not been sent yet
-                const errorMessage = err.message || 'An error occurred';
-                res.status(500).json({ "message": errorMessage }); // Send only the error message
-            }
-        }
     }
-
-
 
 
     private employeefill = async ( number: number) => {
@@ -395,10 +358,6 @@ class FakeData_Controller {
         {name:'test_3', desk:'Абонемент на 8 занятия', cost: 20},
     ]
 
-
-
-
-
     private productFill = async (products: { name: string; desk: string }[] = this.prods) => {
         try {
             for (let product of products) { // Changed "in" to "of" to iterate over values
@@ -414,11 +373,6 @@ class FakeData_Controller {
             throw err;
         }
     }
-
-
-
-
-
 
     private async createSessions(users_local: Partial<UserAttributes>[], staff_local: StaffAttributes[], offices_local: OfficeAttributes[]): Promise<void> {
         const sessions: CustomSessionAttributes[] = [];
@@ -502,40 +456,6 @@ class FakeData_Controller {
                 }   );
             }
         }
-    }
-    private async createPayments(startDate?: Date, endDate?: Date): Promise<void> {
-
-
-        // const twoWeeksAgo = new Date();
-        // twoWeeksAgo.setDate(twoWeeksAgo.getDate() - 14);
-        //
-        // startDate = startDate || twoWeeksAgo;
-        // endDate = endDate || new Date();
-        //
-        // let session: SessionAttributes[] = await this.genericDataLoader(Session_model, {
-        //     where: {
-        //         createdAt: {
-        //             [Op.gte]: startDate,
-        //             [Op.lte]: endDate
-        //         },
-        //     }
-        // });
-        //
-        // let users:Set<number> = new Set();
-        //
-        // session.forEach(ses =>{
-        //     if (users.has(ses.user_id)) {}
-        //     else users.add(ses.user_id)
-        // })
-        //
-        // for (const user of users) {
-        //     // console.log(item);
-        //     let count = session.filter(item=>item.user_id==user).length
-        //
-        //     // Make a new payment,
-        // }
-
-
     }
 
 
@@ -648,6 +568,6 @@ class FakeData_Controller {
 
 }
 
-export default new FakeData_Controller(FakeService)
+export default FakeDataController
 
 

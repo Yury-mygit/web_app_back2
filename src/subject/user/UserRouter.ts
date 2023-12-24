@@ -1,7 +1,28 @@
 import express from 'express';
-import userControllerInstance from "./UserController";
+import Store from "../../servises/store";
+import UserController from "./UserController";
+import UserService from "./UserService";
+import API, {APIResponse} from "../../servises/api";
+
+const userControllerInstance = new UserController({
+    userService: new UserService(),
+    api:  new API({
+        responseStrategy:new APIResponse()
+
+        }),
+    store: new Store()
+    })
 
 const router = express.Router();
+
+
+router.get('/getall', userControllerInstance.getAllUser.bind(userControllerInstance));
+router.post('/getone', userControllerInstance.getOneUser.bind(userControllerInstance));
+router.post('/create', userControllerInstance.createUser.bind(userControllerInstance));
+router.patch('/update', userControllerInstance.updateUser.bind(userControllerInstance));
+router.delete('/delete/:id', userControllerInstance.deleteUser.bind(userControllerInstance));
+export default router;
+
 
 /**
  * @openapi
@@ -37,12 +58,6 @@ const router = express.Router();
  *       responses:
  *         '200':
  *           description: Successful operation
- */
-router.get('/getall', userControllerInstance.getAllUser.bind(userControllerInstance));
-
-/**
- * @openapi
- * paths:
  *   /user/getone:
  *     post:
  *       tags:
@@ -107,7 +122,7 @@ router.get('/getall', userControllerInstance.getAllUser.bind(userControllerInsta
  *                       type: integer
  *                       description: Custom error code indicating the specific error
  */
-router.post('/getone', userControllerInstance.getOneUser.bind(userControllerInstance));
+
 
 /**
  * @openapi
@@ -204,7 +219,7 @@ router.post('/getone', userControllerInstance.getOneUser.bind(userControllerInst
  *                       type: integer
  *                       description: Custom error code indicating the specific error
  */
-router.post('/create', userControllerInstance.createUser.bind(userControllerInstance));
+
 
 /**
  * @openapi
@@ -293,7 +308,6 @@ router.post('/create', userControllerInstance.createUser.bind(userControllerInst
  *                       description: Custom error code indicating the specific error
  *
  */
-router.patch('/update', userControllerInstance.updateUser.bind(userControllerInstance));
 
 /**
  * @openapi
@@ -317,8 +331,3 @@ router.patch('/update', userControllerInstance.updateUser.bind(userControllerIns
  *         404:
  *           description: User not found.
  */
-router.delete('/delete/:id', userControllerInstance.deleteUser.bind(userControllerInstance));
-
-
-
-export default router;
