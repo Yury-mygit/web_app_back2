@@ -9,6 +9,9 @@ import 'dotenv/config'
 const path = require('path');
 const fs = require('fs');
 
+import Store from './servises/store'
+import StoreDebugger from "./servises/storeDebug";
+import StoreManager from "./servises/StoreManager";
 
 const cookieParser = require('cookie-parser')
 const app = express();
@@ -91,6 +94,65 @@ app.get('/home', (req, res) => {
 });
 
 app.use('/', routes);
+
+//
+// const store = new Store();
+// const storeManager = new StoreManager();
+// const debuggers = new Map<string, StoreDebugger>();
+
+//
+// function createDebuggableStore(storeID: string) {
+//     const store = storeManager.createStore(storeID);
+//     const debuggerInstance = new StoreDebugger(storeID, store);
+//     debuggers.set(storeID, debuggerInstance);
+//     return debuggerInstance;
+// }
+import {st} from "./subject/user/UserRouter"
+const storeDebugger = new StoreDebugger(st);
+app.get('/debug/store', (req, res) => {
+    const changeLog = storeDebugger.getChangeLog();
+
+    // Custom replacer to handle circular references
+    const getCircularReplacer = () => {
+        const seen = new WeakSet();
+        return (key:any, value:any) => {
+            if (typeof value === "object" && value !== null) {
+                if (seen.has(value)) {
+                    return "[Circular]";
+                }
+                seen.add(value);
+            }
+            return value;
+        };
+    };
+
+    let changeLogHtml = changeLog.map(change =>
+        `<li>${change.key} - was - <pre>${JSON.stringify(change.oldValue, getCircularReplacer(), 2)}</pre> - became - <pre>${JSON.stringify(change.newValue, getCircularReplacer(), 2)}</pre></li>`
+    ).join('');
+
+    const htmlContent = `
+        <!DOCTYPE html>
+        <html lang="en">
+        <head>
+            <meta charset="UTF-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <title>Store Debugger</title>
+            <style>
+                body { font-family: Arial, sans-serif; }
+                pre { background-color: #f7f7f7; padding: 5px; border: 1px solid #ddd; }
+            </style>
+        </head>
+        <body>
+            <h1>Store Change Log</h1>
+            <ul>${changeLogHtml}</ul>
+        </body>
+        </html>
+    `;
+
+    res.send(htmlContent);
+});
+
+
 
 
 const runServer = async () =>{

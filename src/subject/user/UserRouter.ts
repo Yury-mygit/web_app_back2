@@ -2,15 +2,22 @@ import express from 'express';
 import Store from "../../servises/store";
 import UserController from "./UserController";
 import UserService from "./UserService";
-import API, {APIResponse} from "../../servises/api";
+import CreateUserFactory from "./CreateUserFactory";
+import API, {APIResponse, APIResponseFromStore} from "../../servises/api";
+
+export const st = new Store()
 
 const userControllerInstance = new UserController({
-    userService: new UserService(),
-    api:  new API({
-        responseStrategy:new APIResponse()
 
+    userService: new UserService(
+        new CreateUserFactory()
+    ),
+
+    api:  new API({
+        responseStrategy:new APIResponseFromStore()
         }),
-    store: new Store()
+
+    store: st
     })
 
 const router = express.Router();

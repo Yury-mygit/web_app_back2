@@ -7,35 +7,47 @@ import {IStore} from "./store";
 
 export interface IAPI{
     setRequestStrategy(requestStrategy:IUserCreationStrategy ):void;
-    setResponseStrategy(responseStrategy: IAPIResponse): void;
+    setResponseStrategy(responseStrategy: APIResponseFromStore): void;
     sendRequest(data: Partial<UserAttributes>): Promise<any>;
-    success(res: Response, data: any):void;
+    success(res: Response, data: any): Promise<void>;
+    success(data: string, target: string): Promise<void>;
     error(res: Response, e: any):void;
+    connectStore(store:IStore):void
 }
 
 interface Constructor{
-    responseStrategy?: IAPIResponse,
+    responseStrategy?: APIResponseFromStore,
     requestStrategy?: IUserCreationStrategy
 }
 
 class API implements IAPI {
-    private responseStrategy?: IAPIResponse;
+    private responseStrategy?:  APIResponseFromStore;
     private requestStrategy?: IUserCreationStrategy;
+
+    private store!: IStore
 
     constructor({responseStrategy, requestStrategy}:Constructor) {
         if (responseStrategy) {
             this.responseStrategy = responseStrategy;
+
         }
         if (requestStrategy) {
             this.requestStrategy = requestStrategy;
         }
+
+        this.responseStrategy?.configureStore(this.store)
+    }
+
+    public connectStore = (store:IStore) => {
+        this.store = store
+        this.responseStrategy?.configureStore(this.store)
     }
 
     setRequestStrategy(requestStrategy: IUserCreationStrategy): void {
         this.requestStrategy = requestStrategy;
     }
 
-    setResponseStrategy(responseStrategy: IAPIResponse): void {
+    setResponseStrategy(responseStrategy: APIResponseFromStore): void {
         this.responseStrategy = responseStrategy;
     }
 
@@ -50,23 +62,34 @@ class API implements IAPI {
 
 
 
-    async success(res: Response, data: any) {
-        if (!this.responseStrategy) Log("No response strategy")
-        if (this.responseStrategy) {
+    async success<T extends Response | string, U extends any | string>(res: T, data: U): Promise<void> {
+
+        if (!this.responseStrategy) {
+            Log("No response strategy");
+            throw new Error('No response strategy');
+        }
+
+        // Check if 'res' is a string, which means we need to retrieve data from the store
+        if (typeof res === 'string') {
+            const storedRes = this.store.getData(res);
+            const storedData = this.store.getData(data as string); // Cast 'data' to string because both 'res' and 'data' are strings in this case
+            if (storedRes && storedData) {
+                await this.responseStrategy.success(storedRes, storedData);
+            } else {
+                Log("Stored data not found for key:", res);
+                throw new Error('Stored data not found');
+            }
+        }
+        // Otherwise, 'res' is a Response object and 'data' is any type
+        else if (typeof res === 'object' ) {
             await this.responseStrategy.success(res, data);
         } else {
-            // Handle case where responseStrategy is not set
+            Log("Invalid arguments provided to success method");
+            throw new Error('Invalid arguments provided to success method');
         }
     }
 
-    async success_(res: string, data: string) {
-        if (!this.responseStrategy) Log("No response strategy")
-        if (this.responseStrategy) {
-            await this.responseStrategy.success(res, data);
-        } else {
-            // Handle case where responseStrategy is not set
-        }
-    }
+
 
     async error(res: Response, e: any) {
         if (this.responseStrategy) {
@@ -78,6 +101,13 @@ class API implements IAPI {
 }
 
 export default API
+
+
+
+
+
+
+
 
 
 
@@ -98,8 +128,13 @@ export class APIResponse implements IAPIResponse{
 }
 
 
+
+
+
+
 export interface APIResponseFromStore{
-    success(res: string, data: string):Promise<void>;
+    successStore(res: string, data: string):Promise<void>;
+    success(res: Response, data: any):void;
     configureStore  (store:IStore):void
     // error(res: Response, message: string, statusCode?: number): void
 }
@@ -112,12 +147,20 @@ export class APIResponseFromStore implements APIResponseFromStore{
     configureStore = (store:IStore) => {
         this.store = store
     }
-    async success(res: string, data: string):Promise<void> {
+    async successStore(res: string, data: string):Promise<void> {
         const datas = this.store.getData(data)
         const resp = this.store.getData(res)
 
 
         await resp.status(201).json(datas);
+    }
+
+    async success(res: Response, data: any) {
+        res.status(201).json(await data);
+    }
+
+    async error(res: Response, message: string, statusCode: number = 500) {
+        res.status(statusCode).json({ error: message });
     }
 
     // async error(res: Response, message: string, statusCode: number = 500) {

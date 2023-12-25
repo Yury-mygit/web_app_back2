@@ -1,16 +1,22 @@
 import User_model from "./user_model";
 import { CreateUserDTO, UpdateUserDTO } from "./UserDTO";
 import UserAttributes from "./user_interface";
-import CreateUserFactory from "./CreateUserFactory";
 import {IUserService} from "./UserController";
-import {Response} from "express";
-import Log from "../../servises/debug";
 import {IStore} from "../../servises/store";
+import Log from "../../servises/debug";
 
+export interface ICreateUserFactory{
+    create( payload: Partial<UserAttributes> ):Partial<UserAttributes>
+}
 
 class UserService implements IUserService{
 
     private store !:IStore
+    private factory : ICreateUserFactory
+
+    constructor(factory: ICreateUserFactory) {
+        this.factory = factory
+    }
 
     public configureStore = (ws:IStore)=>{
         this.store = ws
@@ -53,38 +59,24 @@ class UserService implements IUserService{
         }
     }
 
-    // async createUser(CreateUserDTOData: Partial<UserAttributes>) {
-    //
-    //     try {
-    //         const userData: Partial<UserAttributes> = CreateUserFactory.create(CreateUserDTOData);
-    //         const createUserDTO: Partial<UserAttributes> = new CreateUserDTO(userData);
-    //         const user = await User_model.create(createUserDTO);
-    //         // Log(userData)
-    //         return {
-    //             user_id: user.user_id,
-    //             name: user.name,
-    //             surname: user.surname,
-    //             age: user.age,
-    //             status: user.status,
-    //             createdAt: user.createdAt,
-    //             updatedAt: user.updatedAt
-    //         };
-    //
-    //     } catch (error: any) {
-    //         throw new Error(error.message);
-    //     }
-    // }
+    validateUser = (data: string, target: string) => {
 
-    async createUser(data: string, target: string){
+        const data_:Partial<UserAttributes> = this.store.getData(data)
 
-        let CreateUserDTOData = this.store.getData(data)
+        const createUserDTO: Partial<UserAttributes> = new CreateUserDTO(data_);
+        const userData: Partial<UserAttributes> = this.factory.create(createUserDTO);
+
+        this.store.setData(target, userData)
+    }
+    async createUser(data: string, target: string):Promise<void>{
+
+        console.time()
+
+        const data_: Partial<UserAttributes> = this.store.getData(data)
 
         try {
-            const userData: Partial<UserAttributes> = CreateUserFactory.create(CreateUserDTOData);
-            const createUserDTO: Partial<UserAttributes> = new CreateUserDTO(userData);
-            this.store.setData('status','Запрос данных')
-            const user = await User_model.create(createUserDTO);
-            this.store.setData('status','Запись данных')
+            const user:Partial<UserAttributes> = await User_model.create(data_);
+            // console.log(this.store)
             this.store.setData(target, {
                 user_id: user.user_id,
                 name: user.name,
@@ -98,6 +90,8 @@ class UserService implements IUserService{
         } catch (error: any) {
             throw new Error(error.message);
         }
+        console.timeEnd()
+
     }
 
     async updateUser(updateStudentDTO: UpdateUserDTO):Promise<void> {

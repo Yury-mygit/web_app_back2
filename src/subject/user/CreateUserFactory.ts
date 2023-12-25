@@ -1,8 +1,10 @@
 import { CreateUserDTO } from "./UserDTO";
-import UserAttributes, {UserStatus} from "./user_interface"; // Import the original UserAttributes interface
+import UserAttributes, {UserStatus} from "./user_interface";
+import {ICreateUserFactory} from "./UserService";
 
-class CreateUserFactory {
-    static create( payload: Partial<UserAttributes> ) {
+
+class CreateUserFactory implements ICreateUserFactory{
+    create( payload: Partial<UserAttributes> ) {
 
         return  {
             // user_id: payload.user_id,

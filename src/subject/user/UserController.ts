@@ -19,10 +19,10 @@ export interface IUserController{
 export interface IUserService{
     getAllUsers(skip: number, limit: number):Promise<Partial<UserAttributes>[]>
     getOneUser(payload: Partial<UserAttributes>):Promise<Partial<UserAttributes>>
-    createUser(data:string, target:string):void
+    createUser(data:string, target:string):Promise<void>
     updateUser(updateStudentDTO: UpdateUserDTO):Promise<void>
     deleteUser(userId: number):Promise<void>
-
+    validateUser(data:string, target:string):void
     configureStore(ws:IStore):void
 }
 
@@ -37,6 +37,7 @@ class UserController implements IUserController{
     private userService:IUserService;
     private api: IAPI
     private store: IStore
+    private a:any
 
     constructor({ userService, api , store}: { userService: IUserService, api: IAPI , store: IStore}) {
         this.userService = userService;
@@ -44,12 +45,16 @@ class UserController implements IUserController{
         this.store = store
 
         this.userService.configureStore(this.store)
+        this.api.connectStore(this.store)
+
         this.store.subscribe((key, oldValue, newValue) => {
-            // console.log(`Change detected for key "${key}": from`, oldValue, 'to', newValue);
-            // Perform any asynchronous action here
+
+            this.a = newValue
             if (key == 'status') console.log(key, "  ", newValue)
+
         });
     }
+
     async getAllUser(req: Request, res: Response) {
         try {
             const skip = parseInt(req.query.skip as string) || 0;
@@ -65,28 +70,24 @@ class UserController implements IUserController{
         res.json(await this.userService.getOneUser(req.body as Partial<UserAttributes>))
     }
 
+
     createUser = async (req: Request, res: Response) =>{
+        // 1. Initialize to store for this request and save data
+        this.store.setMultipleData({"res":res, 'rawData':req.body, 'prepData':{}, 'resultData':{} })
 
-        /*
-        1. Initialize to store for this request and save data
-        2. Save to database
-        3. maker response
-         */
+        // 2 Validate data from
+        this.userService.validateUser('rawData','prepData')
 
-        const payload:Partial<UserAttributes> = req.body
+        // 3. Save to database
+        await this.userService.createUser('prepData', 'resultData')
 
-        this.store.setMultipleData({"res":res, 'data':payload, 'result':{}})
-        this.userService.createUser('data', "result")
-        this.api.success("res",'sd')
-        // await run(this.userService.createUser, this.userService, 'data', "result")
+        // 4. maker response
+        await this.api.success("res",'resultData')
 
 
-        // try {
-        //     await this.api.success(res, this.userService.createUser({...req.body as Partial<UserAttributes>}))
-        // }catch (e){
-        //     await this.api.error(res, e)
-        // }
+        // console.log(this.store.getData('prepData'))
     }
+
 
     async updateUser(req: Request, res: Response) {
         try {
