@@ -3,9 +3,11 @@ import Store from "../../servises/store";
 import UserController from "./UserController";
 import UserService from "./UserService";
 import CreateUserFactory from "./CreateUserFactory";
-import API, {APIResponse, APIResponseFromStore} from "../../servises/api";
-
-export const st = new Store()
+import API, {IAPIResponseFromStoreStrategy} from "../../servises/api";
+import {StoreDebugger} from '../../debugger/StoreDebugger'
+import Lackofdata from "../../servises/strategies/lackofdata";
+export const store = new Store()
+export const st = new StoreDebugger(store, 'store-changes.log');
 
 const userControllerInstance = new UserController({
 
@@ -14,18 +16,25 @@ const userControllerInstance = new UserController({
     ),
 
     api:  new API({
-        responseStrategy:new APIResponseFromStore()
+        responseStrategy:new Lackofdata()
         }),
 
-    store: st
+    store: store
     })
 
 const router = express.Router();
 
+import {core} from "../../app";
+
 
 router.get('/getall', userControllerInstance.getAllUser.bind(userControllerInstance));
 router.post('/getone', userControllerInstance.getOneUser.bind(userControllerInstance));
-router.post('/create', userControllerInstance.createUser.bind(userControllerInstance));
+
+
+// router.post('/create' , userControllerInstance.createUser.bind(userControllerInstance))
+// router.post('/create', core.agents.createAgent.user)
+router.post('/create', core.create.user)
+
 router.patch('/update', userControllerInstance.updateUser.bind(userControllerInstance));
 router.delete('/delete/:id', userControllerInstance.deleteUser.bind(userControllerInstance));
 export default router;
@@ -128,12 +137,8 @@ export default router;
  *                     errorCode:
  *                       type: integer
  *                       description: Custom error code indicating the specific error
- */
-
-
-/**
- * @openapi
- * paths:
+ *
+ *
  *   /user/create:
  *     post:
  *       tags:
@@ -225,12 +230,8 @@ export default router;
  *                     errorCode:
  *                       type: integer
  *                       description: Custom error code indicating the specific error
- */
-
-
-/**
- * @openapi
- * paths:
+ *
+ *
  *   /user/update:
  *     patch:
  *       tags:
@@ -314,11 +315,6 @@ export default router;
  *                       type: integer
  *                       description: Custom error code indicating the specific error
  *
- */
-
-/**
- * @openapi
- * paths:
  *   /user/delete.{id}:
  *     delete:
  *       tags:

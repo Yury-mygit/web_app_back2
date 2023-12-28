@@ -1,12 +1,8 @@
 import UserAttributes from "./user_interface";
 import { Request, Response } from 'express';
-import UserService from './UserService';
-import { CreateUserDTO, UpdateUserDTO } from './UserDTO';
-import API_, {APIResponse, IAPI} from "../../servises/api";
-import Log, {run} from "../../servises/debug";
+import { UpdateUserDTO } from './UserDTO';
+import { IAPI } from "../../servises/api";
 import {IStore} from "../../servises/store";
-
-// const API = new API_(new APIResponse())
 
 export interface IUserController{
     getAllUser(req: Request, res: Response):void
@@ -21,6 +17,7 @@ export interface IUserService{
     getOneUser(payload: Partial<UserAttributes>):Promise<Partial<UserAttributes>>
     createUser(data:string, target:string):Promise<void>
     updateUser(updateStudentDTO: UpdateUserDTO):Promise<void>
+    updateUser_s(data: string, target: string):Promise<void>
     deleteUser(userId: number):Promise<void>
     validateUser(data:string, target:string):void
     configureStore(ws:IStore):void
@@ -44,6 +41,9 @@ class UserController implements IUserController{
         this.api = api;
         this.store = store
 
+
+        this.store.setData('api',this.api)
+
         this.userService.configureStore(this.store)
         this.api.connectStore(this.store)
 
@@ -53,6 +53,7 @@ class UserController implements IUserController{
             if (key == 'status') console.log(key, "  ", newValue)
 
         });
+
     }
 
     async getAllUser(req: Request, res: Response) {
@@ -90,13 +91,26 @@ class UserController implements IUserController{
 
 
     async updateUser(req: Request, res: Response) {
-        try {
-            const updateStudentDTO = new UpdateUserDTO(req.body);
-            await this.userService.updateUser(updateStudentDTO);
-            res.json({ message: 'Student updated successfully' });
-        } catch (error: any) {
-            res.status(500).json({ error: error.message });
-        }
+
+        //Initialize to store for this request and save data
+        this.store.setMultipleData({"res":res, 'up_rawData':req.body, 'up_prepData':{}, 'up_resultData':{} })
+
+        // Validate data from
+        this.userService.validateUser('up_rawData','up_prepData')
+
+        // Save to database
+        this.userService.updateUser_s('up_prepData','up_rawData')
+
+        // Saker response
+
+
+        // try {
+        //     const updateStudentDTO = new UpdateUserDTO(req.body);
+        //     await this.userService.updateUser(updateStudentDTO);
+        //     res.json({ message: 'Student updated successfully' });
+        // } catch (error: any) {
+        //     res.status(500).json({ error: error.message });
+        // }
     }
 
     async deleteUser(req: Request, res: Response) {

@@ -2,6 +2,32 @@ import { Sequelize, Table, Column, Model, DataType,  CreatedAt, UpdatedAt, AutoI
 import { sequelize } from '../../database/database';
 import {UserStatus} from "./user_interface";
 
+export interface IUserModel {
+    user_id: number;
+    name: string;
+    surname: string;
+    parents?: string;
+    age: number;
+    status: UserStatus;
+    attendance?: number;
+    absences?: number;
+    email?: string;
+    telephone?: string;
+    telegram_notification: boolean;
+    telegram_id: number;
+    issue: string;
+    initial_diagnosis_date?: string;
+    address: string;
+    found_through: string;
+    online: boolean;
+    notes: string;
+    createdAt: Date;
+    updatedAt: Date;
+
+    // If there are any instance methods, include them here as well.
+    // methodName(param1: Type1, param2: Type2): ReturnType;
+}
+
 @Table({ tableName: 'users' })
 export class User_model extends Model {
     @AutoIncrement

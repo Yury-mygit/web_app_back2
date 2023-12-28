@@ -4,6 +4,7 @@ import UserAttributes from "./user_interface";
 import {IUserService} from "./UserController";
 import {IStore} from "../../servises/store";
 import Log from "../../servises/debug";
+import {IAPI} from "../../servises/api";
 
 export interface ICreateUserFactory{
     create( payload: Partial<UserAttributes> ):Partial<UserAttributes>
@@ -12,6 +13,7 @@ export interface ICreateUserFactory{
 class UserService implements IUserService{
 
     private store !:IStore
+    private api !: IAPI
     private factory : ICreateUserFactory
 
     constructor(factory: ICreateUserFactory) {
@@ -20,7 +22,15 @@ class UserService implements IUserService{
 
     public configureStore = (ws:IStore)=>{
         this.store = ws
+
+        this.api = this.store.getData('api')
+
+        if (!this.api) {
+            console.log("api is not set")
+            throw new Error('api is not set')
+        }
     }
+
     async getAllUsers(skip: number, limit: number): Promise<Partial<UserAttributes>[]> {
         try {
             const students = await User_model.findAll({
@@ -91,6 +101,45 @@ class UserService implements IUserService{
             throw new Error(error.message);
         }
         console.timeEnd()
+
+    }
+
+    async updateUser_s(data: string, target: string):Promise<void>{
+
+        console.time()
+
+
+
+        const data_: Partial<UserAttributes> = this.store.getData(data)
+
+        const user_id = data_.user_id || undefined
+        const telegram_id = data_.telegram_id || undefined
+
+        if (!user_id){
+            if(!telegram_id) {
+                this.api.lackOfDataError('fghjgfdsasdfgh')
+            }
+        }
+
+        // Log(this.store.getData('api'))
+
+        // try {
+        //     const user:Partial<UserAttributes> = await User_model.create(data_);
+        //     // console.log(this.store)
+        //     this.store.setData(target, {
+        //         user_id: user.user_id,
+        //         name: user.name,
+        //         surname: user.surname,
+        //         age: user.age,
+        //         status: user.status,
+        //         createdAt: user.createdAt,
+        //         updatedAt: user.updatedAt
+        //     })
+        //
+        // } catch (error: any) {
+        //     throw new Error(error.message);
+        // }
+        // console.timeEnd()
 
     }
 

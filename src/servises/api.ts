@@ -7,21 +7,31 @@ import {IStore} from "./store";
 
 export interface IAPI{
     setRequestStrategy(requestStrategy:IUserCreationStrategy ):void;
-    setResponseStrategy(responseStrategy: APIResponseFromStore): void;
+    setResponseStrategy(responseStrategy: IAPIResponseFromStoreStrategy): void;
     sendRequest(data: Partial<UserAttributes>): Promise<any>;
     success(res: Response, data: any): Promise<void>;
     success(data: string, target: string): Promise<void>;
     error(res: Response, e: any):void;
+    lackOfDataError(test:string):void
     connectStore(store:IStore):void
 }
 
+export interface IAPIResponseFromStoreStrategy{
+    successStore(res: string, data: string):Promise<void>;
+    success(res: Response, data: any):void;
+    configureStore  (store:IStore):void
+    error(res: Response, message: string, statusCode?: number): void
+    lackOfDataError(test:string):void
+}
+
+
 interface Constructor{
-    responseStrategy?: APIResponseFromStore,
+    responseStrategy?: IAPIResponseFromStoreStrategy,
     requestStrategy?: IUserCreationStrategy
 }
 
 class API implements IAPI {
-    private responseStrategy?:  APIResponseFromStore;
+    private responseStrategy?:  IAPIResponseFromStoreStrategy;
     private requestStrategy?: IUserCreationStrategy;
 
     private store!: IStore
@@ -35,19 +45,20 @@ class API implements IAPI {
             this.requestStrategy = requestStrategy;
         }
 
-        this.responseStrategy?.configureStore(this.store)
+        // this.responseStrategy?.configureStore(this.store)
     }
 
     public connectStore = (store:IStore) => {
         this.store = store
         this.responseStrategy?.configureStore(this.store)
+        // this.responseStrategy?.configureStore(this.store)
     }
 
     setRequestStrategy(requestStrategy: IUserCreationStrategy): void {
         this.requestStrategy = requestStrategy;
     }
 
-    setResponseStrategy(responseStrategy: APIResponseFromStore): void {
+    setResponseStrategy(responseStrategy: IAPIResponseFromStoreStrategy): void {
         this.responseStrategy = responseStrategy;
     }
 
@@ -89,7 +100,11 @@ class API implements IAPI {
         }
     }
 
+    async lackOfDataError(test:string) {
 
+        await this.responseStrategy?.lackOfDataError(test);
+
+    }
 
     async error(res: Response, e: any) {
         if (this.responseStrategy) {
@@ -112,60 +127,55 @@ export default API
 
 
 
-export interface IAPIResponse{
-    success(res: Response, data: any):void;
-    error(res: Response, message: string, statusCode?: number): void
-}
-
-export class APIResponse implements IAPIResponse{
-    async success(res: Response, data: any) {
-        res.status(201).json(await data);
-    }
-
-    async error(res: Response, message: string, statusCode: number = 500) {
-        res.status(statusCode).json({ error: message });
-    }
-}
-
-
+// export interface IAPIResponse{
+//     success(res: Response, data: any):void;
+//     error(res: Response, message: string, statusCode?: number): void
+// }
+//
+// export class APIResponse implements IAPIResponse{
+//     async success(res: Response, data: any) {
+//         res.status(201).json(await data);
+//     }
+//
+//     async error(res: Response, message: string, statusCode: number = 500) {
+//         res.status(statusCode).json({ error: message });
+//     }
+// }
 
 
 
 
-export interface APIResponseFromStore{
-    successStore(res: string, data: string):Promise<void>;
-    success(res: Response, data: any):void;
-    configureStore  (store:IStore):void
-    // error(res: Response, message: string, statusCode?: number): void
-}
 
 
-export class APIResponseFromStore implements APIResponseFromStore{
-
-    private store!: IStore
-
-    configureStore = (store:IStore) => {
-        this.store = store
-    }
-    async successStore(res: string, data: string):Promise<void> {
-        const datas = this.store.getData(data)
-        const resp = this.store.getData(res)
 
 
-        await resp.status(201).json(datas);
-    }
 
-    async success(res: Response, data: any) {
-        res.status(201).json(await data);
-    }
-
-    async error(res: Response, message: string, statusCode: number = 500) {
-        res.status(statusCode).json({ error: message });
-    }
-
-    // async error(res: Response, message: string, statusCode: number = 500) {
-    //     res.status(statusCode).json({ error: message });
-    // }
-}
+// export class APIResponseFromStoreStrategy implements IAPIResponseFromStoreStrategy{
+//
+//     private store!: IStore
+//
+//     configureStore = (store:IStore) => {
+//         this.store = store
+//     }
+//     async successStore(res: string, data: string):Promise<void> {
+//         const datas = this.store.getData(data)
+//         const resp = this.store.getData(res)
+//
+//
+//         await resp.status(201).json(datas);
+//     }
+//
+//     async success(res: Response, data: any) {
+//         res.status(201).json(await data);
+//     }
+//
+//     async error(res: Response, message: string, statusCode: number = 500) {
+//         res.status(statusCode).json({ error: message });
+//     }
+//
+//     // async error(res: Response, message: string, statusCode: number = 500) {
+//     //     res.status(statusCode).json({ error: message });
+//     // }
+// }
 
 
