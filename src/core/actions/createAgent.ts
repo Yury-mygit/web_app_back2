@@ -17,6 +17,7 @@ class CreateAgent extends BaseAgent implements ICreateAgent{
     initData !: any
     validData !: any
     buildData  !: any
+    result !: any
     answer !: any
 
     constructor(core: ICore) {
@@ -43,31 +44,16 @@ class CreateAgent extends BaseAgent implements ICreateAgent{
 
         this.buildData = driver.factory.create(this.validData)
 
-        try {
-            const answer:ansver = await driver.model.create(this.buildData);
-            this.res.json(answer)
+        this.result = await driver.save({model: driver.model, data: this.buildData})
 
-        } catch (error: any) {
-            this.res.json(error)
-        }
+        this.answer = driver.answer(this.result, ['user_id', 'name', 'surname', 'age', 'status', 'createdAt' ])
 
 
 
+        // build answer
+        this.res.json(this.answer)
 
-        // this.store.setMultipleData({"res":res, 'rawData':req.body, 'prepData':{}, 'resultData':{} })
 
-        // 2 Validate data from
-        if ('getFactory' in driver && typeof driver.getFactory === 'function') {
-            // const factory = (driver as IUserDriver).getFactory();
-            // console.log(factory);
-        }
-        driver.validate()
-        //
-        // // 3. Save to database
-        // await this.driver.createUser('prepData', 'resultData')
-        //
-        // // 4. maker response
-        // await this.driver.success("res",'resultData')
     }
 
 
