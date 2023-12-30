@@ -9,6 +9,10 @@ import Lackofdata from "../../servises/strategies/lackofdata";
 export const store = new Store()
 export const st = new StoreDebugger(store, 'store-changes.log');
 
+import EventEmitter from "events";
+
+import {myEmitterInstance} from "../../core/actions/createAgent";
+
 const userControllerInstance = new UserController({
 
     userService: new UserService(
@@ -33,7 +37,10 @@ router.post('/getone', userControllerInstance.getOneUser.bind(userControllerInst
 
 // router.post('/create' , userControllerInstance.createUser.bind(userControllerInstance))
 // router.post('/create', core.agents.createAgent.user)
-router.post('/create', core.create.user)
+router.post('/create', (req, res)=> {
+
+    myEmitterInstance.emit('eventA', req, res);
+})
 
 router.patch('/update', userControllerInstance.updateUser.bind(userControllerInstance));
 router.delete('/delete/:id', userControllerInstance.deleteUser.bind(userControllerInstance));

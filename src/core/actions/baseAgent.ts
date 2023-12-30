@@ -13,6 +13,7 @@ class BaseAgent implements IBaseAgent {
     }
 
 
+
 }
 
 export default BaseAgent

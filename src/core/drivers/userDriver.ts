@@ -13,7 +13,6 @@ export class UserDriver extends BaseDriver implements IUserDriver {
     public factory : ICreateUserFactory
     public dto: ICreateUserDTO
     public model: any
-    // public answerFilter: any
 
     constructor({
                     factory,
@@ -25,7 +24,6 @@ export class UserDriver extends BaseDriver implements IUserDriver {
         this.factory = factory
         this.dto = dto
         this.model = model
-        // this.answerFilter = answerFilter
     }
 }
 
@@ -37,5 +35,4 @@ interface ConstructorParams {
     factory: ICreateUserFactory;
     dto: ICreateUserDTO;
     model: any;
-    // answerFilter: any;
 }

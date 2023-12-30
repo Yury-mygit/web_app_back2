@@ -1,5 +1,7 @@
 import IStore from '../store'
 import answerFilter from "../filter/UserAnswerFilter";
+import {Response} from "express";
+import Core from "../core";
 
 export interface IBaseEntity {
     configureStore(store_: IStore) :void
@@ -8,7 +10,10 @@ export interface IBaseEntity {
     // configureStore
     save({ model, data }: { model: any, data: any }): Promise<any>;
     answer(data: any, filter: string[]): any
+    sendOkAnswer (data: any, res: Response):any
 
+    validate(data: any):any
+    buildDataPackToDB(data: any):any
     answerBuild(data: any) :any;
     dto:any
     factory:any
@@ -34,6 +39,31 @@ abstract class BaseDriver implements IBaseEntity{
 
 
 
+
+
+    public validate = (data:any):any => {
+         // console.log(this.dto)
+        try{
+            return this.dto.validate(data)
+
+        }catch (e){
+            console.log(e)
+        }
+    }
+
+    buildDataPackToDB = (data: any):any => {
+        try{
+            return this.factory.create(data)
+
+        }catch (e){
+            console.log(e)
+        }
+    }
+
+
+
+
+
     public save = async ({model, data} : {model: any, data:any}) => {
         try {
             const answer:any = await model.create(data);
@@ -56,6 +86,17 @@ abstract class BaseDriver implements IBaseEntity{
             }
         });
         return filteredData;
+    }
+
+    public sendOkAnswer = (data: any, res: Response) =>{
+
+        res.status(201).json(data)
+    }
+
+
+
+    public sendErrorAnswer = (data: any, res: Response) =>{
+        res.status(400).json(data)
     }
 
 }

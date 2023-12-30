@@ -2,7 +2,7 @@
 Core -
 
  */
-
+import {Request, Response} from "express";
 import CreateAgent from "./actions/createAgent";
 import GetAgent from "./actions/getAgent";
 import UserDriver from "./drivers/userDriver";
@@ -15,6 +15,9 @@ import User_model from "../subject/user/user_model";
 import UserAnswerFilter from "./filter/UserAnswerFilter";
 
 import {IDriver, IAgents, ICore } from './interfases'
+// import EventEmitter from "events";
+// import {core} from "../app";
+
 
 
 class Core implements ICore{
@@ -25,7 +28,6 @@ class Core implements ICore{
             factory: new CreateUserFactory(),
             dto: new CreateUserDTO(),
             model: User_model
-            // answerFilter: new UserAnswerFilter()
         }),
         officeDriver: new OfficeDriver(),
         paymentDriver: new PaymentDriver()
