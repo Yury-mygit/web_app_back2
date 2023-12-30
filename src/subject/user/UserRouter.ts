@@ -11,7 +11,7 @@ export const st = new StoreDebugger(store, 'store-changes.log');
 
 import EventEmitter from "events";
 
-import {myEmitterInstance} from "../../core/actions/createAgent";
+// import {myEmitterInstance} from "../../core/actions/createAgent";
 
 const userControllerInstance = new UserController({
 
@@ -39,7 +39,7 @@ router.post('/getone', userControllerInstance.getOneUser.bind(userControllerInst
 // router.post('/create', core.agents.createAgent.user)
 router.post('/create', (req, res)=> {
 
-    myEmitterInstance.emit('eventA', req, res);
+    // myEmitterInstance.emit('eventA', req, res);
 })
 
 router.patch('/update', userControllerInstance.updateUser.bind(userControllerInstance));

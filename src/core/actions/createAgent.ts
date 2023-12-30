@@ -15,46 +15,8 @@ import User_model from "../../subject/user/user_model";
 import {core} from "../../app";
 // export const myEmitter = new EventEmitter();
 
-interface ImyEmitter   {
-    eventQueue: any
-}
 
-import EventEmitter from "events";
-
-interface ImyEmitter {
-    emit(event: string | symbol, ...args: any[]): boolean;
-    processNext(): void;
-}
-export class myEmitter extends EventEmitter implements ImyEmitter {
-    eventQueue: Array<{ event: string | symbol; args: any[] }>;
-    processing: boolean;
-
-    constructor() {
-        super();
-        this.eventQueue = [];
-        this.processing = false;
-    }
-
-    emit(event: string | symbol, ...args: any[]): boolean {
-
-        this.eventQueue.push({ event, args });
-        this.processNext();
-        return true;
-    }
-
-    async processNext(): Promise<void> {
-        // console.log(this.processing || this.eventQueue.length === 0)
-        if (this.processing || this.eventQueue.length === 0) {
-            return;
-        }
-        this.processing = true;
-        const { event, args } = this.eventQueue.shift()!;
-        super.emit(event, ...args);
-
-    }
-}
-
-export const myEmitterInstance =  new myEmitter();
+// export const myEmitterInstance =  new myEmitter();
 class CreateAgent extends BaseAgent implements ICreateAgent{
 
     req !: Request
@@ -67,8 +29,8 @@ class CreateAgent extends BaseAgent implements ICreateAgent{
 
     constructor(core: ICore) {
         super(core)
-        const emitterInstance = myEmitterInstance
-        emitterInstance.on('eventA', this.user.bind(this));
+        // const emitterInstance = myEmitterInstance
+        // emitterInstance.on('eventA', this.user.bind(this));
     }
 
     public user = async (req: express.Request, res: express.Response): Promise<void> => {
@@ -79,8 +41,8 @@ class CreateAgent extends BaseAgent implements ICreateAgent{
         this.initData = req.body
         await this.createFlow(this.core.drivers.userDriver)
 
-        myEmitterInstance.processing =false
-        myEmitterInstance.processNext()
+        // myEmitterInstance.processing =false
+        // myEmitterInstance.processNext()
         return
     }
     public office = async (req: express.Request, res: express.Response): Promise<void> => {
