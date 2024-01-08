@@ -7,7 +7,7 @@ const router = express.Router();
 import {core} from "../../app";
 
 router.get('/', controller.getAll);
-router.post('/create', core.agents.createAgent.office);
+// router.post('/create', core.agents.createAgent.office);
 
 
 

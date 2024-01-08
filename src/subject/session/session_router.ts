@@ -3,6 +3,17 @@ import sessionController from "./session_controller"
 
 const router = express.Router();
 
+router.get('/', sessionController.getAllSessions);
+router.patch('/',sessionController.updateSession)
+router.post('/', sessionController.createSession)
+router.delete('/', sessionController.deleteSession)
+
+router.post("/fulfill", sessionController.fulfill)
+
+export default router;
+
+
+
 /**
  * @openapi
  * paths:
@@ -92,14 +103,3 @@ const router = express.Router();
  *         '200':
  *           description: Student updated successfully
  */
-
-router.get('/', sessionController.getAllSessions);
-router.patch('/',sessionController.updateSession)
-router.post('/', sessionController.createSession)
-router.delete('/', sessionController.deleteSession)
-
-router.post("/fulfill", sessionController.fulfill)
-
-export default router;
-
-

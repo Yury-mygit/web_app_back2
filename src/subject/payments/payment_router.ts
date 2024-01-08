@@ -8,6 +8,17 @@ paymentsRouter.post('/getall', ...Validator.validateGetAllPays(), controller.get
 paymentsRouter.post('/get_by_telegram_id', ...Validator.validate_get_by_telegram_id(), controller.getByTelegramID);
 paymentsRouter.post('/create', ...Validator.validateCreatePay(), controller.createPay);
 paymentsRouter.patch('/update', ...Validator.validateUpdatePay(), controller.updatePay);
+paymentsRouter.post('/consume', ...Validator.validateConsumePay(), async (req, res, next) => {
+    try {
+        // @ts-ignore
+        await controller.consumePayment({ req, res, next });
+    } catch (error) {
+        next(error);
+    }
+});
+paymentsRouter.patch('/test', controller.test)
+paymentsRouter.delete("/delete",...Validator.validateDelete(), controller.deletePayment);
+
 
 /**
  * @openapi
@@ -17,7 +28,7 @@ paymentsRouter.patch('/update', ...Validator.validateUpdatePay(), controller.upd
  *       tags:
  *           - Payment
  *       summary: Update a new payment record
- *       description: Consume a payment or abonnement session
+ *       description: Consume a payment or atonement session
  *       requestBody:
  *         required: true
  *         content:
@@ -35,19 +46,6 @@ paymentsRouter.patch('/update', ...Validator.validateUpdatePay(), controller.upd
  *       responses:
  *         '201':
  *           description: Student added successfully
- */
-paymentsRouter.post('/consume', ...Validator.validateConsumePay(), async (req, res, next) => {
-    try {
-        // @ts-ignore
-        await controller.consumePayment({ req, res, next });
-    } catch (error) {
-        next(error);
-    }
-});
-
-/**
- * @openapi
- * paths:
  *   /payment/test:
  *     patch:
  *       tags:
@@ -66,17 +64,6 @@ paymentsRouter.post('/consume', ...Validator.validateConsumePay(), async (req, r
  *       responses:
  *         '201':
  *           description: Student added successfully
- */
-paymentsRouter.patch('/test', controller.test)
-
-
-
-paymentsRouter.delete("/delete",...Validator.validateDelete(), controller.deletePayment);
-
-
-/**
- * @openapi
- * paths:
  *   /payment/getall:
  *     post:
  *       tags:

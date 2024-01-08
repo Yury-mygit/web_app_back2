@@ -26,7 +26,7 @@ export interface ICreateUserDTO {
     attendance?: number;
     absences?: number;
 
-    validate(payload: Partial<UserAttributes>): CreateUserDTO | null
+    validate(payload: Partial<UserAttributes>): CreateUserDTO | null | any
 }
 export default class CreateUserDTO implements ICreateUserDTO {
 
@@ -57,7 +57,8 @@ export default class CreateUserDTO implements ICreateUserDTO {
     @IsOptional()
     initial_diagnosis_date?: string;
 
-    @IsNotEmpty()
+    @IsString()
+    @IsOptional()
     address?: string;
 
     @IsNotEmpty()
@@ -71,17 +72,23 @@ export default class CreateUserDTO implements ICreateUserDTO {
     @IsOptional()
     absences?: number;
 
-    public validate(payload: Partial<UserAttributes>): CreateUserDTO | null {
+    public validate(payload: Partial<UserAttributes>): CreateUserDTO | null | any {
         Object.assign(this, payload);
         const validationErrors = validateSync(this);
 
         if (validationErrors.length > 0) {
             // Handle validation errors, e.g., log them or throw an exception
-            console.error(validationErrors);
-            return null;
+            // console.error(validationErrors);
+            return {
+                status: 'error',
+                data: validationErrors
+            };
         }
 
-        return this; // Return the instance with assigned values
+        return {
+            status: 'ok',
+            data: this
+        }; // Return the instance with assigned values
     }
 
 

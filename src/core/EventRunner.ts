@@ -20,7 +20,6 @@ export class myEmitter extends EventEmitter implements ImyEmitter {
     }
 
     emit(event: string | symbol, ...args: any[]): boolean {
-
         this.eventQueue.push({ event, args });
         this.processNext();
         return true;
@@ -28,12 +27,20 @@ export class myEmitter extends EventEmitter implements ImyEmitter {
 
     async processNext(): Promise<void> {
         // console.log(this.processing || this.eventQueue.length === 0)
-        if (this.processing || this.eventQueue.length === 0) {
+        if (
+            // this.processing ||
+            this.eventQueue.length === 0) {
             return;
         }
+        // console.log('===============================')
+        // console.log(this.eventQueue)
+        // console.log('############################')
         this.processing = true;
+        // const { event, args } = this.eventQueue.shift()!;
         const { event, args } = this.eventQueue.shift()!;
         super.emit(event, ...args);
 
     }
 }
+
+export default myEmitter

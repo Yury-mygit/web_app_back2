@@ -1,15 +1,25 @@
 import express from 'express';
 import ProductModel from "./product_model";
 import controller from './product_controller'
+import {emiter} from "../../core/core";
 
 const router = express.Router();
 
-// Route to get all products
+
+router.get('/', controller.getAll);
+router.post('/', controller.create);
+router.put('/:product_id', controller.update);
+router.delete('/:product_id', controller.delete);
+
+router.post ('/takemanyproducts', (req, res)=> {
+    emiter.emit('takemanyproducts', req, res)
+})
+
+// Route to create a new product
 /**
  * @openapi
- * paths:
- *   /product/:
- *     get:
+ * /product/:
+ *   get:
  *       tags:
  *         - Product
  *       summary: The api.ts for gathering products
@@ -34,13 +44,6 @@ const router = express.Router();
  *       responses:
  *         '200':
  *           description: Successful operation
- */
-router.get('/', controller.getAll);
-
-// Route to create a new product
-/**
- * @openapi
- * /product/:
  *   post:
  *     tags:
  *       - Product
@@ -67,13 +70,7 @@ router.get('/', controller.getAll);
  *         description: Invalid input
  *       '500':
  *         description: Server error
- */
-router.post('/', controller.create);
-
-// Route to update an existing product by product_id
-/**
- * @openapi
- * /product/{product_id}:
+ *
  *   put:
  *     tags:
  *       - Product
@@ -103,13 +100,7 @@ router.post('/', controller.create);
  *         description: Product not found
  *       '500':
  *         description: Server error
- */
-router.put('/:product_id', controller.update);
-
-// Route to delete a product by product_id
-/**
- * @openapi
- * /product/{product_id}:
+ *
  *   delete:
  *     tags:
  *       - Product
@@ -129,7 +120,7 @@ router.put('/:product_id', controller.update);
  *       '500':
  *         description: Server error
  */
-router.delete('/:product_id', controller.delete);
+
 
 
 

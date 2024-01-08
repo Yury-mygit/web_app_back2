@@ -1,4 +1,3 @@
-import {IStore} from "../store";
 import {IUserDriver} from "../drivers/userDriver";
 import {IOfficeDriver} from "../drivers/officeDriver";
 import {IPaymentDriver} from "../drivers/paymentsDriver"
@@ -7,16 +6,6 @@ import {ICore} from "../core";
 import BaseAgent from "./baseAgent";
 import {Request, Response} from "express";
 import UserAttributes from "../../subject/user/user_interface";
-import User_model from "../../subject/user/user_model";
-
-// import EventEmitter from "events";
-//
-
-import {core} from "../../app";
-// export const myEmitter = new EventEmitter();
-
-
-// export const myEmitterInstance =  new myEmitter();
 class CreateAgent extends BaseAgent implements ICreateAgent{
 
     req !: Request

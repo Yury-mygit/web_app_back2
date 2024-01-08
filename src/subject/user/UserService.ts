@@ -6,7 +6,7 @@ import {IStore} from "../../servises/store";
 import Log from "../../servises/debug";
 import {IAPI} from "../../servises/api";
 
-export interface ICreateUserFactory{
+export interface IUpdateUserFactory {
     create( payload: Partial<UserAttributes> ):Partial<UserAttributes>
 }
 
@@ -14,9 +14,9 @@ class UserService implements IUserService{
 
     private store !:IStore
     private api !: IAPI
-    private factory : ICreateUserFactory
+    private factory : IUpdateUserFactory
 
-    constructor(factory: ICreateUserFactory) {
+    constructor(factory: IUpdateUserFactory) {
         this.factory = factory
     }
 

@@ -3,14 +3,15 @@ import UserAttributes, {UserStatus} from "./user_interface";
 import {IUpdateUserFactory} from "./UserService";
 
 
-class CreateUserFactory implements IUpdateUserFactory{
+class UpdateUserFactory implements IUpdateUserFactory{
 
     constructor() {
     }
     create( payload: Partial<UserAttributes> ) {
 
+
         return  {
-            // user_id: payload.user_id,
+            user_id: payload.user_id,
             name: payload.name || undefined,
             surname: payload.surname || undefined,
             parents: payload.parents || undefined,
@@ -34,4 +35,4 @@ class CreateUserFactory implements IUpdateUserFactory{
     }
 }
 
-export default CreateUserFactory;
+export default UpdateUserFactory;

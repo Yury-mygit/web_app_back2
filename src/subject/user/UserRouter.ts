@@ -1,4 +1,4 @@
-import express from 'express';
+import express,{Request, Response} from 'express';
 import Store from "../../servises/store";
 import UserController from "./UserController";
 import UserService from "./UserService";
@@ -11,7 +11,7 @@ export const st = new StoreDebugger(store, 'store-changes.log');
 
 import EventEmitter from "events";
 
-// import {myEmitterInstance} from "../../core/actions/createAgent";
+import {emiter} from "../../core/core";
 
 const userControllerInstance = new UserController({
 
@@ -31,20 +31,32 @@ const router = express.Router();
 import {core} from "../../app";
 
 
-router.get('/getall', userControllerInstance.getAllUser.bind(userControllerInstance));
-router.post('/getone', userControllerInstance.getOneUser.bind(userControllerInstance));
+router.get('/getall', (req, res)=> {
 
+    emiter.emit('letGetManyUsers', req, res);
+});
+router.post('/getone',(req, res)=> {
 
-// router.post('/create' , userControllerInstance.createUser.bind(userControllerInstance))
-// router.post('/create', core.agents.createAgent.user)
+    emiter.emit('getOneUser', req, res);
+});
+
 router.post('/create', (req, res)=> {
 
-    // myEmitterInstance.emit('eventA', req, res);
+    emiter.emit('createNewUserEvent', req, res);
 })
 
-router.patch('/update', userControllerInstance.updateUser.bind(userControllerInstance));
-router.delete('/delete/:id', userControllerInstance.deleteUser.bind(userControllerInstance));
+router.patch('/update', (req, res)=>{
+        emiter.emit('updateCurrentUserEvent', req, res)
+})
+
+router.delete('/delete/:id',(req, res)=>{
+    emiter.emit('deleteCurrentUserEvent', req, res)
+})
+
+// router.patch('/update', userControllerInstance.updateUser.bind(userControllerInstance));
 export default router;
+
+
 
 
 /**
@@ -341,3 +353,8 @@ export default router;
  *         404:
  *           description: User not found.
  */
+
+
+
+// router.post('/create' , userControllerInstance.createUser.bind(userControllerInstance))
+// router.post('/create', core.agents.createAgent.user)

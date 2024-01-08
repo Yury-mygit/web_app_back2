@@ -22,7 +22,7 @@ export interface ProductAttributes{
     product_type: ProductType;
     name:string;
     desc: number;
-
+    cost:number;
     }
 
 @Table({ tableName: 'product' })

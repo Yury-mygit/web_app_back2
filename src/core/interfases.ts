@@ -9,8 +9,8 @@ import {Request, Response} from "express";
 
 interface IDriver {
     userDriver: IUserDriver;
-    officeDriver: IOfficeDriver;
-    paymentDriver: IPaymentDriver;
+    // officeDriver: IOfficeDriver;
+    // paymentDriver: IPaymentDriver;
 }
 
 interface IAgents {
@@ -25,9 +25,9 @@ interface ICoreCreate {
     payment(req: Request, res: Response): Promise<void>;
 }
 interface ICore{
-    agents: IAgents
-    drivers: IDriver
-    create:ICoreCreate;
+    // agents: IAgents
+    // drivers: IDriver
+    // create:ICoreCreate;
 }
 
 
