@@ -8,6 +8,7 @@ import {IAPI} from "../../servises/api";
 
 export interface IUpdateUserFactory {
     create( payload: Partial<UserAttributes> ):Partial<UserAttributes>
+    update( payload: Partial<UserAttributes> ):Partial<UserAttributes>
 }
 
 class UserService implements IUserService{

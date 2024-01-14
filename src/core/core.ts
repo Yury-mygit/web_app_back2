@@ -104,104 +104,32 @@ class Core implements ICore{
 
     public getOneEntity = async (req: Request, res: Response, driver: any)=> {
 
-        const validData = driver.userIdValidate(req.body)
-            // console.log(validData)
-            if (validData.status == 'error')  driver.sendErrorAnswer(validData, res)
-
-        // const answer = driver.getOne(req)
-
-
-        // if (validData.status =='error') {
-        //     res.json(validData)
-        // }
-
-        // const answer = driver.getOne(req )
-
-        // let answer = 'ok'
-        // driver.sendOkAnswer("validData", res)
-    }
-
-    public getManyEntity = async (req: Request, res: Response, driver: any) => {
-
-        //Prepare data
-        const limit = typeof req.query.limit === 'string' ? parseInt(req.query.limit, 10) : 2;
-        const skip = typeof req.query.skip === 'string' ? parseInt(req.query.skip, 10) : 0;
-
-        if (isNaN(limit) || isNaN(skip)) {
-            driver.sendErrorAnswer('Invalid limit or skip parameter', res)
-            return
-        }
-
-        // Gathering data from database
-        const answer = await driver.getMany({ limit, skip});
-        if (answer.status == 'error') {
-            driver.sendErrorAnswer(answer, res)
-            return
-        }
-
-        // Making an answer
-        driver.sendOkAnswer(answer, res);
+        await driver.getOne(req, res)
 
     }
 
+    public getManyEntity = async (
+        req: Request,
+        res: Response,
+        driver: IUserDriver | IOfficeDriver | IPaymentDriver | ISessionDriver
+    ): Promise<void> => {
+        await driver.getMany(req, res)
+    }
 
     public createNewEntity = async (
         req: Request,
         res: Response,
-        driver:
-            IUserDriver
-            | IOfficeDriver
-            // | IPaymentDriver
-            // | ISessionDriver
+        driver: IUserDriver | IOfficeDriver | IPaymentDriver | ISessionDriver
     ):Promise<void> => {
-
-        // validate thi incoming data
-        const validData = driver.validate(req.body)
-
-        // fill data set to full value
-        const buildData = driver.buildDataPackToDB(validData)
-
-        // save the data
-        const result = await driver.save({
-            model: driver.model,
-            data: buildData,
-
-        })
-
-        // prepare answer
-        const answer = driver.answer(result, ['user_id', 'name', 'surname', 'age', 'status', 'createdAt' ])
-
-        // send answer
-        driver.sendOkAnswer(answer, res)
-
-        // emiter.processing =false
-        // emiter.processNext()
+        await driver.create(req, res)
     }
 
     public updateCurrentEntity = async (
         req: Request,
         res: Response,
-        driver: IUserDriver
-            | IOfficeDriver
-            // | IPaymentDriver
-            // | ISessionDriver
+        driver: IUserDriver | IOfficeDriver | IPaymentDriver | ISessionDriver
     ) :Promise<void> => {
-
-        const validData = driver.validate(req.body)
-        const buildData = driver.buildDataPackToDB(validData)
-        const result = await driver.update({
-            model: driver.model,
-            data: buildData,
-            res: res
-        })
-
-        const answer = driver.answer(result, ['user_id', 'name', 'surname', 'age', 'status', 'createdAt' ])
-
-        driver.sendOkAnswer(answer, res)
-
-        // res.json('ok')
-        emiter.processing =false
-        emiter.processNext()
+        await driver.update(req, res)
     }
 
     public deleteCurrentEntity = async (
@@ -209,6 +137,10 @@ class Core implements ICore{
         res: Response,
         driver: IUserDriver | IOfficeDriver | IPaymentDriver | ISessionDriver
     )=> {
+
+    }
+
+    public consumePayment = async () => {
 
     }
 

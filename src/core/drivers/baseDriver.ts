@@ -11,15 +11,16 @@ export interface IBaseEntity {
     sayHello():void
     // configureStore
     save({ model, data }: { model: any, data: any }): Promise<any>;
-    update({ model, data, res }: { model: any, data: any, res: Response }): Promise<any>;
+    update(req: Request, res: Response): Promise<void>;
     answer(data: any, filter: string[]): any
     sendOkAnswer (data: any, res: Response):any
     sendErrorAnswer(data: any, res: Response):any
-    getOne (req: Request):Promise<any>
-    getMany({limit, skip} : {limit: number, skip: number}):Promise<any>
+    getOne (req: Request, res: Response):Promise<void>
+    getMany(req: Request, res: Response):Promise<void>
     // validate(data: any):any
     buildDataPackToDB(data: any):any
     answerBuild(data: any) :any;
+    create(req: Request, res: Response) : Promise<void>
     dto:any
     factory:any
     model:any
@@ -51,48 +52,41 @@ abstract class BaseDriver implements IBaseEntity{
 
 
     buildDataPackToDB = (data: any):any => {
+        if (!this.factory) {
+            console.error("Factory is not defined.");
+            return;
+        }
+
         try{
             return this.factory.create(data)
 
         }catch (e){
-            console.log(e)
+            console.log("the error is",e)
         }
     }
 
 
-    public getOne = async (req: Request):Promise<any> => {
-
-        // const {user_id, telegram_id, ...other }:{user_id :number, telegram_id:number}= req.body
-        //  console.log(req)
-
-        const {user_id, telegram_id, ...rest }:{user_id :number, telegram_id:number, rest: any }= req.body
-
-        const options = {
-            where:{}
-        }
-
-        if ( user_id) {
-            options.where = {
-                user_id:  user_id
-            };
-        } else {
-            options.where = {
-                telegram_id:  telegram_id
-            };
+    buildDataUpdatePackToDB = (data: any): any => {
+        if (!this.factory) {
+            console.error("Factory is not defined.");
+            return;
         }
 
         try {
-            const user = await User_model.findOne(options);
-            if (!user) throw new Error('There is no user with user id =' +  user_id)
-            return user;
-        } catch (error: any) {
-            throw new Error(error.message);
+            return this.factory.update(data);
+        } catch (e) {
+            console.error("the error is", e);
         }
+    };
+
+
+    public getOne = async (req: Request, res: Response):Promise<void> => {
+
     }
 
-    public getMany= async ({limit, skip} : {limit: number, skip: number}):Promise<any> => {
+    public getMany= async (req: Request, res: Response):Promise<void> => {
 
-
+        let { limit, skip } = req.body;
 
         try {
 
@@ -105,23 +99,25 @@ abstract class BaseDriver implements IBaseEntity{
                 attributes:this.attributes
             });
             // console.log(ansver)
-            return {
+            this.sendOkAnswer({
                 status: 'ok',
                 data: ansver
-            };
+            }, res)
         } catch (error: any) {
-            return {
+            this.sendErrorAnswer( {
                 status: 'error',
                 data: error
-            }
+            }, res)
         }
     }
 
 
 
     public save = async ({model, data} : {model: any, data:any}) => {
+
+        // console.log(data)
         try {
-            const answer:any = await this.model.create(data);
+            const answer:any = await model.create(data);
             return answer.dataValues
 
         } catch (error: any) {
@@ -129,19 +125,19 @@ abstract class BaseDriver implements IBaseEntity{
         }
     }
 
-    public update = async ({model, data, res} : {model: any, data:any, res: Response}) => {
+    public update = async (req: Request, res: Response) => {
 
-        try {
-             if (!data.user_id && !data.telegram_id) {
-                 return {"status" : "error" , 'desk': "The user cannot be identified. Set user_id or telegram_id"}
-             }
-
-             const answer:any = await model.update(data, { where: { user_id: data.user_id } });
-             return answer.dataValues
-
-        } catch (error: any) {
-            throw new Error(error)
-        }
+        // try {
+        //      if (!data.user_id && !data.telegram_id) {
+        //          return {"status" : "error" , 'desk': "The user cannot be identified. Set user_id or telegram_id"}
+        //      }
+        //
+        //      const answer:any = await model.update(data, { where: { user_id: data.user_id } });
+        //      return answer.dataValues
+        //
+        // } catch (error: any) {
+        //     throw new Error(error)
+        // }
     }
 
 
@@ -170,9 +166,11 @@ abstract class BaseDriver implements IBaseEntity{
 
 
     public sendErrorAnswer = (data: any, res: Response) =>{
-         console.log(data)
+         // console.log(data)
         res.status(400).json(data)
     }
+
+    public create = async (req: Request, res: Response) : Promise<void> => {}
 
 }
 

@@ -8,12 +8,13 @@ import {
     IsOptional,
     IsDate,
     IsString,
-    validateSync
+    validateSync, isOctal
 } from 'class-validator';
 import UserAttributes, {UserStatus} from "../../subject/user/user_interface";
 
 
 export interface ICreateUserDTO {
+    user_id?: number;
     name?: string;
     surname?: string;
     parents?: string;
@@ -29,7 +30,9 @@ export interface ICreateUserDTO {
     validate(payload: Partial<UserAttributes>): CreateUserDTO | null | any
 }
 export default class CreateUserDTO implements ICreateUserDTO {
-
+    @IsNotEmpty()
+    // @IsOptional()
+    user_id?: number;
 
     @IsNotEmpty()
     name?: string;
@@ -73,6 +76,7 @@ export default class CreateUserDTO implements ICreateUserDTO {
     absences?: number;
 
     public validate(payload: Partial<UserAttributes>): CreateUserDTO | null | any {
+        // console.log(payload)
         Object.assign(this, payload);
         const validationErrors = validateSync(this);
 
@@ -84,6 +88,8 @@ export default class CreateUserDTO implements ICreateUserDTO {
                 data: validationErrors
             };
         }
+
+        // console.log(this)
 
         return {
             status: 'ok',

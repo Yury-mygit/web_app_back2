@@ -31,7 +31,7 @@ const router = express.Router();
 import {core} from "../../app";
 
 
-router.get('/getall', (req, res)=> {
+router.post('/getall', (req, res)=> {
 
     emiter.emit('letGetManyUsers', req, res);
 });
@@ -63,33 +63,26 @@ export default router;
  * @openapi
  * paths:
  *   /user/getall:
- *     get:
+ *     post:
  *       tags:
  *         - user
  *       summary: Your route summary
  *       description: Your route description
- *       parameters:
- *         - name: skip
- *           in: query
- *           description: Number of items to skip before starting to collect the result set
- *           required: false
- *           schema:
- *             type: integer
- *             format: int32
- *         - name: limit
- *           in: query
- *           description: Limits the number of items in the result set
- *           required: false
- *           schema:
- *             type: integer
- *             format: int32
- *         - name: user_id
- *           in: query
- *           description: Id of user
- *           required: false
- *           schema:
- *             type: integer
- *             format: int32
+ *       requestBody:
+ *         required: true
+ *         content:
+ *           application/json:
+ *            schema:
+ *               type: object
+ *               properties:
+ *                 limit:
+ *                   type: number
+ *                   default: 10
+ *                 skip:
+ *                   type: number
+ *                   default: 0
+ *
+ *
  *       responses:
  *         '200':
  *           description: Successful operation
@@ -116,10 +109,10 @@ export default router;
  *               properties:
  *                 user_id:
  *                   type: string
- *                   default: Иван
+ *                   default: 192
  *                 telegram_id:
  *                   type: string
- *                   default: Иванов
+ *                   default:
  *
  *       responses:
  *         '200':
@@ -263,6 +256,9 @@ export default router;
  *             schema:
  *               type: object
  *               properties:
+ *                 user_id:
+ *                   type: number
+ *                   default: 191
  *                 name:
  *                   type: string
  *                   default: Дима
