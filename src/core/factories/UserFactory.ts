@@ -1,19 +1,18 @@
-import { CreateUserDTO } from "./UserDTO";
-import UserAttributes, {UserStatus} from "./user_interface";
-// import {IUpdateUserFactory} from "./UserService";
 
-export interface IUpdateUserFactory {
+import UserAttributes from "../models/user_model";
+// import {ICreateUserFactory} from "../../subject/user/UserService";
+
+export interface ICreateUserFactory {
     create( payload: Partial<UserAttributes> ):Partial<UserAttributes>
     update( payload: Partial<UserAttributes> ):Partial<UserAttributes>
 }
 
-class CreateUserFactory implements IUpdateUserFactory{
+class UserFactory implements ICreateUserFactory{
 
     constructor() {
     }
+    create( payload: Partial<UserAttributes> ) {
 
-    public create( payload: Partial<UserAttributes> ) {
-        console.log(payload)
         return  {
             // user_id: payload.user_id,
             name: payload.name || undefined,
@@ -65,4 +64,4 @@ class CreateUserFactory implements IUpdateUserFactory{
     }
 }
 
-export default CreateUserFactory;
+export default UserFactory;

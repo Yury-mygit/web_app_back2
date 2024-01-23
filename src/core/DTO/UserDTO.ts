@@ -10,7 +10,7 @@ import {
     IsString,
     validateSync, isOctal
 } from 'class-validator';
-import UserAttributes, {UserStatus} from "../../subject/user/user_interface";
+import UserAttributes, {UserStatus} from "../interfas/userAtributes";
 
 
 export interface ICreateUserDTO {
@@ -29,9 +29,9 @@ export interface ICreateUserDTO {
 
     validate(payload: Partial<UserAttributes>): CreateUserDTO | null | any
 }
+
 export default class CreateUserDTO implements ICreateUserDTO {
-    @IsNotEmpty()
-    // @IsOptional()
+    @IsOptional()
     user_id?: number;
 
     @IsNotEmpty()
@@ -76,28 +76,22 @@ export default class CreateUserDTO implements ICreateUserDTO {
     absences?: number;
 
     public validate(payload: Partial<UserAttributes>): CreateUserDTO | null | any {
-        // console.log(payload)
+
         Object.assign(this, payload);
         const validationErrors = validateSync(this);
 
         if (validationErrors.length > 0) {
-            // Handle validation errors, e.g., log them or throw an exception
-            // console.error(validationErrors);
             return {
                 status: 'error',
                 data: validationErrors
             };
         }
 
-        // console.log(this)
-
         return {
             status: 'ok',
             data: this
-        }; // Return the instance with assigned values
+        };
     }
-
-
 }
 
 

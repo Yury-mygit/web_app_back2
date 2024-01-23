@@ -3,7 +3,7 @@ import IDataGenerationStrategy from "./DataGeneration/IDataGenerationStrategy";
 import { validate, ValidationError } from 'class-validator';
 import {NextFunction, Request, Response} from "express";
 import UserValidate from "./validate";
-import UserAttributes from "../../subject/user/user_interface";
+import UserAttributes from "../../core/interfas/userAtributes";
 // import Log from "../../servises/debug";
 import {IExecutor, IWorkspace} from "../fake_controller";
 

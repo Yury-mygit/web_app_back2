@@ -1,4 +1,4 @@
-import {ProductAttributes} from "../../subject/product/product_model";
+import {ProductAttributes} from "../models/product_model";
 
 export interface ICreateProductFactory{
     create( payload: Partial<ProductAttributes> ):Partial<ProductAttributes>

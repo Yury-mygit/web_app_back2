@@ -1,12 +1,12 @@
 import express from 'express';
-import studentsRouter from './subject/user/UserRouter';
-import employeesRouter from './subject/staff/employee_router';
-import sessionsRouter from './subject/session/session_router';
-import officesRouter from './subject/office/office_router';
-import productRouters from './subject/product/product_router';
-import {paymentsRouter} from './subject/payments/payment_router';
+import studentsRouter from './core/routers/UserRouter';
+import employeesRouter from './core/routers/employee_router';
+import sessionsRouter from './core/routers/session_router';
+import officesRouter from './core/routers/office_router';
+import productRouters from './core/routers/product_router';
+import {paymentsRouter} from './core/routers/payment_router';
 import testRouter from './mok/fake_router'
-import product_router from "./subject/product/product_router";
+import product_router from "./core/routers/product_router";
 
 const router = express.Router();
 

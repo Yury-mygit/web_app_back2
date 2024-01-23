@@ -1,59 +1,47 @@
 import express,{Request, Response} from 'express';
 import Store from "../../servises/store";
-import UserController from "./UserController";
-import UserService from "./UserService";
-import CreateUserFactory from "./CreateUserFactory";
-import API, {IAPIResponseFromStoreStrategy} from "../../servises/api";
 import {StoreDebugger} from '../../debugger/StoreDebugger'
-import Lackofdata from "../../servises/strategies/lackofdata";
 export const store = new Store()
 export const st = new StoreDebugger(store, 'store-changes.log');
 
-import EventEmitter from "events";
-
-import {emiter} from "../../core/core";
-
-const userControllerInstance = new UserController({
-
-    userService: new UserService(
-        new CreateUserFactory()
-    ),
-
-    api:  new API({
-        responseStrategy:new Lackofdata()
-        }),
-
-    store: store
-    })
+import {emiter} from "../core";
 
 const router = express.Router();
 
-import {core} from "../../app";
 
 
-router.post('/getall', (req, res)=> {
 
-    emiter.emit('letGetManyUsers', req, res);
-});
-router.post('/getone',(req, res)=> {
+router.post('/take/one/by_id',(req, res)=> {
 
-    emiter.emit('getOneUser', req, res);
+    emiter.emit('TakeOneUserByIdEvent', req, res);
 });
 
-router.post('/create', (req, res)=> {
+router.post('/take/one/by_telegram_id',(req: Request, res: Response)=> {
 
-    emiter.emit('createNewUserEvent', req, res);
+    emiter.emit('TakeOneUserByTelegramIdEvent', req, res);
+});
+
+router.post('/take/many', (req: Request, res: Response)=> {
+
+    emiter.emit('TakeManyUsersEvent', req, res);
+});
+
+router.post('/create/one', (req: Request, res: Response)=> {
+
+    emiter.emit('CreateOneUserEvent', req, res);
 })
 
-router.patch('/update', (req, res)=>{
-        emiter.emit('updateCurrentUserEvent', req, res)
+router.patch('/update/one', (req: Request, res: Response)=>{
+        emiter.emit('UpdateOneUserEvent', req, res)
 })
 
-router.delete('/delete/:id',(req, res)=>{
-    emiter.emit('deleteCurrentUserEvent', req, res)
+router.delete('/delete/one/:id',(req: Request, res: Response)=>{
+    const id = req.params.id;
+    console.log(id)
+    emiter.emit('DeleteOneUserEvent', req, res)
 })
 
-// router.patch('/update', userControllerInstance.updateUser.bind(userControllerInstance));
+
 export default router;
 
 
@@ -62,7 +50,7 @@ export default router;
 /**
  * @openapi
  * paths:
- *   /user/getall:
+ *   /user/take/one/by_id:
  *     post:
  *       tags:
  *         - user
@@ -73,46 +61,11 @@ export default router;
  *         content:
  *           application/json:
  *            schema:
- *               type: object
- *               properties:
- *                 limit:
- *                   type: number
- *                   default: 10
- *                 skip:
- *                   type: number
- *                   default: 0
- *
- *
- *       responses:
- *         '200':
- *           description: Successful operation
- *   /user/getone:
- *     post:
- *       tags:
- *         - user
- *       summary: Your route summary
- *       description: Your route description
- *       requestBody:
- *         required: true
- *         content:
- *           application/json:
- *            schema:
- *               oneOf:
- *                 - required: [user_id]
- *                   properties:
- *                     user_id:
- *                       type: string
- *                 - required: [telegram_id]
- *                   properties:
- *                     telegram_id:
- *                       type: string
- *               properties:
- *                 user_id:
- *                   type: string
- *                   default: 192
- *                 telegram_id:
- *                   type: string
- *                   default:
+ *              type: object
+ *              properties:
+ *                user_id:
+ *                  type: number
+ *                  default: 191
  *
  *       responses:
  *         '200':
@@ -150,8 +103,86 @@ export default router;
  *                       type: integer
  *                       description: Custom error code indicating the specific error
  *
+ *   /user/take/one/by_telegram_id:
+ *     post:
+ *       tags:
+ *         - user
+ *       summary: Your route summary
+ *       description: Your route description
+ *       requestBody:
+ *         required: true
+ *         content:
+ *           application/json:
+ *            schema:
+ *              type: object
+ *              properties:
+ *                telegram_id:
+ *                  type: number
+ *                  default: 565047052
  *
- *   /user/create:
+ *
+ *       responses:
+ *         '200':
+ *           description: Successful operation
+ *           content:
+ *             application/json:
+ *               schema:
+ *                 type: object
+ *                 properties:
+ *                   id:
+ *                     type: integer
+ *
+ *           '400':
+ *             description: Bad request
+ *             content:
+ *               application/json:
+ *                 schema:
+ *                   type: object
+ *                   properties:
+ *                     error:
+ *                       type: string
+ *                     errorCode:
+ *                       type: integer
+ *                       description: Custom error code indicating the specific error
+ *           '500':
+ *             description: Internal server error
+ *             content:
+ *               application/json:
+ *                 schema:
+ *                   type: object
+ *                   properties:
+ *                     error:
+ *                       type: string
+ *                     errorCode:
+ *                       type: integer
+ *                       description: Custom error code indicating the specific error
+ *
+ *   /user/take/many:
+ *     post:
+ *       tags:
+ *         - user
+ *       summary: Your route summary
+ *       description: Your route description
+ *       requestBody:
+ *         required: true
+ *         content:
+ *           application/json:
+ *            schema:
+ *               type: object
+ *               properties:
+ *                 limit:
+ *                   type: number
+ *                   default: 10
+ *                 skip:
+ *                   type: number
+ *                   default: 0
+ *
+ *
+ *       responses:
+ *         '200':
+ *           description: Successful operation
+ *
+ *   /user/create/one:
  *     post:
  *       tags:
  *         - user
@@ -244,7 +275,7 @@ export default router;
  *                       description: Custom error code indicating the specific error
  *
  *
- *   /user/update:
+ *   /user/update/one:
  *     patch:
  *       tags:
  *         - user
@@ -330,16 +361,18 @@ export default router;
  *                       type: integer
  *                       description: Custom error code indicating the specific error
  *
- *   /user/delete.{id}:
+ *   /user/delete/one/{id}:
  *     delete:
  *       tags:
  *         - user
  *       summary: Delete a user
- *       description: Deletes a user by their unique ID.
+ *       description: |
+ *          Deletes a user by their unique ID. Provide the ID of the user to delete in the path.
  *       parameters:
  *         - in: path
  *           name: id
  *           required: true
+ *           default: 200
  *           schema:
  *             type: integer
  *           description: Unique ID of the user to delete.
@@ -348,6 +381,8 @@ export default router;
  *           description: User successfully deleted.
  *         404:
  *           description: User not found.
+ *         400:
+ *            description: Bad request, ID parameter is missing or invalid.
  */
 
 

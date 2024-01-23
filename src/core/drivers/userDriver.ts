@@ -1,127 +1,62 @@
 import BaseDriver, {IBaseEntity} from "./baseDriver";
-import {ICreateUserFactory} from "../factories/CreateUserFactory";
+import {ICreateUserFactory} from "../factories/UserFactory";
 import {ICreateUserDTO} from "../DTO/UserDTO";
-import User_model, {IUserModel} from "../../subject/user/user_model";
+import User_model from "../models/user_model";
 import {Request, Response} from "express";
-import {emiter} from "../core";
 
 interface IUserDriver extends IBaseEntity{
     factory : ICreateUserFactory | undefined
     dto: ICreateUserDTO | undefined;
     model: any
-    validate(data: any):any
-    validation(req: Request): {
-        status: string,
-        data: {telegram_id: number | undefined, user_id: number | undefined}
-    }
-    create(req: Request, res: Response) : Promise<void>
+    validate(data: any):any;
+    takeByTelegramId (req: Request, res: Response):Promise<void>;
+    takeOne (req: Request, res: Response):Promise<void>;
+    takeMany(req: Request, res: Response):Promise<void>;
+    create(req: Request, res: Response) : Promise<void>;
     update(req: Request, res: Response) : Promise<void>;
-    // takeManyAtr: string[]
+    delete(req:Request, res: Response): Promise<void>;
     attributes : string[]
 }
 
-interface data {
-    status: string,
-    data: {
-        errorDesc?:string,
-        telegram_id: number | undefined,
-        user_id: number | undefined
-    }
+interface ConstructorParams {
+    factory?: ICreateUserFactory;
+    dto?: ICreateUserDTO;
+    model?: any;
 }
 
-export class UserDriver extends BaseDriver implements IUserDriver {
+
+class UserDriver extends BaseDriver implements IUserDriver {
     public factory !: ICreateUserFactory | undefined
     public dto !: ICreateUserDTO | undefined
     public model !: any
     attributes : string[] = ["user_id", "name", "age"]
 
-    constructor({
-                    factory,
-                    dto,
-                    model,
-                    // answerFilter
-    }: ConstructorParams ) {
+    constructor({factory, dto, model,}: ConstructorParams ) {
         super(dto );
         this.factory = factory
         this.dto = dto
         this.model = model
-
-        // console.log( this.dto )
     }
 
-    public validate = (data:any) => {
-        // console.log(  data  )
-        // console.log('this.dto')
-
-
+    public validate = (data:any):any => {
         try{
-
             if(!this.dto) throw new Error('DTO not found!')
-
-            // console.log(this.dto.validate(data))
-
             return this.dto.validate(data)
-
         }catch (e){
             console.log("Validation error",e)
             return {'status': "error", 'desc':e}
         }
     }
 
+    public takeMany = async (req: Request, res: Response): Promise<void> => {
+        // Call the takeMany method from BaseDriver
+        await this.baseTakeMany(req, res)
+        // await super.baseTakeMany(req, res)
 
-    public validation = (data: any): data => {
-
-        const {user_id, telegram_id} = data
-        //
-        console.log(user_id, telegram_id)
-
-        if (typeof user_id == "number" ) {
-            if (typeof telegram_id == "number"){
-                return {
-                    status:"ok",
-                    data: {
-                        errorDesc: undefined,
-                        user_id: user_id,
-                        telegram_id: telegram_id
-                    }
-                }
-            } else {
-                return {
-                    status:"ok",
-                    data: {
-                        errorDesc: undefined,
-                        user_id: user_id,
-                        telegram_id: undefined
-                    }
-                }
-            }
-
-        } else {
-            if (typeof telegram_id !== "number"  ){
-                return {
-                    status:"ok",
-                    data: {
-                        errorDesc: undefined,
-                        user_id: undefined,
-                        telegram_id: telegram_id
-                    }
-                }
-            }
-        }
+    };
 
 
-
-        return {
-            status:"error",
-            data: {
-                errorDesc: " user_id or telegram_id should be a number ",
-                user_id: undefined,
-                telegram_id: undefined
-            }
-        }
-    }
-
-    public getOne = async (req: Request, res: Response): Promise<void> => {
+    public takeOne_old = async (req: Request, res: Response): Promise<void> => {
         let { user_id, telegram_id } = req.body;
 
         user_id = Number(user_id);
@@ -159,32 +94,102 @@ export class UserDriver extends BaseDriver implements IUserDriver {
         }
     };
 
-    public create = async (req: Request, res: Response) : Promise<void> => {
-        const validData = this.validate(req.body)
 
+    public takeByTelegramId = async (req: Request, res: Response): Promise<void> =>{
+        const telegram_id :number = Number(req.body.telegram_id)
 
-        // fill data set to full value
-        const buildData = this.buildDataPackToDB(validData.data)
-        // console.log(buildData)
-        // save the data
-        const result = await this.save({
-            model: this.model,
-            data: buildData,
+        if ( telegram_id == 0 ) {
+            this.sendErrorAnswer(typeof (`telegram_id are incorrect = ${telegram_id}`), res)
+            return
+        }
+        const options = {
+            where:  { "telegram_id" :  telegram_id}
+        };
+        try {
+            const user = await User_model.findOne(options);
+            if (!user) {
+                this.sendErrorAnswer({
+                    status: "error",
+                    data: {
+                        errorDesc: 'There is no user with the provided identifier'
+                    }
+                }, res);
+                return;
+            }
 
-        })
+            this.sendOkAnswer({
+                status: "ok",
+                data: user
+            }, res);
 
-        // prepare answer
-        const answer = this.answer(result, ['user_id', 'name', 'surname', 'age', 'status', 'createdAt' ])
+        } catch (error) {
+            console.error(error);
+            res.status(500).send('An unexpected error occurred');
+        }
+    }
 
-        // send answer
-        this.sendOkAnswer(answer, res)
+    public takeOne = async (req: Request, res: Response): Promise<void> => {
+        const  user_id  =  Number(req.body.user_id)
+
+        if ( user_id == 0 ) {
+            this.sendErrorAnswer(typeof (`user_id are incorrect = ${user_id}`), res)
+            return
+        }
+
+        const options = {
+            where:  { "user_id" :  user_id}
+        };
+
+        try {
+            const user = await User_model.findOne(options);
+            if (!user) {
+                this.sendErrorAnswer({
+                    status: "error",
+                    data: {
+                        errorDesc: 'There is no user with the provided identifier'
+                    }
+                }, res);
+                return;
+            }
+
+            this.sendOkAnswer({
+                status: "ok",
+                data: user
+            }, res);
+
+        } catch (error) {
+            console.error(error);
+            res.status(500).send('An unexpected error occurred');
+        }
     }
 
 
+    public create = async (req: Request, res: Response) : Promise<void> => {
+
+
+        const validData = this.validate(req.body)
+        const buildData = this.buildDataPackToDB(validData.data)
+        const result = await this.save({
+            model: this.model,
+            data: buildData,
+        })
+
+        const answer = this.answer(result, ['user_id', 'name', 'surname', 'age', 'status', 'createdAt' ])
+
+        this.sendOkAnswer(answer, res)
+    }
 
     public update = async (req: Request, res: Response): Promise<void> => {
+
+
+
         const validData = this.validate(req.body);
+
+
+
         const buildData = this.buildDataUpdatePackToDB(validData.data);
+
+
 
         try {
             if (!buildData.user_id && !buildData.telegram_id) {
@@ -192,14 +197,17 @@ export class UserDriver extends BaseDriver implements IUserDriver {
                 return;
             }
 
-            // Assuming that `this.model.update` returns the number of affected rows
-            const [affectedRows] = await this.model.update(buildData, { where: { user_id: buildData.user_id } });
+            let options = {}
+
+            if (!buildData.user_id){
+                options = { where: { telegram_id: buildData.telegram_id } }
+            } else options = { where: { user_id: buildData.user_id } }
+
+            const [affectedRows] = await this.model.update(buildData, options);
 
             if (affectedRows > 0) {
-                // Retrieve the updated record
                 const updatedRecord = await this.model.findOne({ where: { user_id: buildData.user_id } });
                 if (updatedRecord) {
-                    // Send back the fields of the updated record
                     this.sendOkAnswer({
                         user_id: updatedRecord.user_id,
                         name: updatedRecord.name,
@@ -230,14 +238,17 @@ export class UserDriver extends BaseDriver implements IUserDriver {
             this.sendErrorAnswer(error, res);
         }
     };
+
+    public delete = async (req: Request, res: Response): Promise<void> =>{
+        this.baseDelete(req, res)
+    }
+
+
 }
+
+
 
 export default UserDriver
 export {IUserDriver}
 
 
-interface ConstructorParams {
-    factory?: ICreateUserFactory;
-    dto?: ICreateUserDTO;
-    model?: any;
-}

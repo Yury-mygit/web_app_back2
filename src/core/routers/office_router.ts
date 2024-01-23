@@ -1,13 +1,15 @@
-import express from 'express';
-import Office_model from './office_model'
-import controller from './office_controller'
+import express,{Request, Response} from 'express';
+
+
 
 const router = express.Router();
+import {emiter} from "../core";
 
-import {core} from "../../app";
 
-router.get('/', controller.getAll);
-// router.post('/create', core.agents.createAgent.office);
+router.post('/', (req: Request, res: Response)=>{
+    emiter.emit('TakeOneUserByIdEvent', req, res);
+});
+
 
 
 

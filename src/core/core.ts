@@ -3,23 +3,19 @@ Core -
 
  */
 import {Request, Response} from "express";
-import CreateAgent from "./actions/createAgent";
-import GetAgent from "./actions/getAgent";
 import UserDriver, {IUserDriver} from "./drivers/userDriver";
-import UpdateAgent from "./actions/updateAgent";
 import ProductDriver from "./drivers/productDriver";
 import OfficeDriver, {IOfficeDriver} from "./drivers/officeDriver";
 import PaymentDriver, {IPaymentDriver} from "./drivers/paymentsDriver";
 import CreateProductFactory from "./factories/CreateProductFactory";
-import CreateUserFactory from "./factories/CreateUserFactory";
+import UserFactory from "./factories/UserFactory";
 import CreateUserDTO from "./DTO/UserDTO";
-import User_model from "../subject/user/user_model";
+import User_model from "./models/user_model";
+import ProductModel from "./models/product_model";
 import {IDriver, IAgents, ICore } from './interfases'
-
 import myEmitter from './EventRunner'
 import {ISessionDriver} from "./drivers/sessionDriver";
-import UpdateUserFactory from "../subject/user/UpdateUserFactory";
-import {error} from "winston";
+
 
 export const emiter = new myEmitter()
 
@@ -36,7 +32,7 @@ class a  implements test{
 class Core implements ICore{
     private static instance: Core;
     private userDrive =   new UserDriver({
-        factory: new CreateUserFactory(),
+        factory: new UserFactory(),
         dto: new CreateUserDTO(),
         model: User_model
     })
@@ -44,22 +40,22 @@ class Core implements ICore{
     private productDriver = new ProductDriver({
         factory: new CreateProductFactory(),
         dto: new CreateUserDTO(),
-        model: User_model
+        model: ProductModel
     })
 
     // public drivers: IDriver = {
     //     userDriver: new UserDriver({
-    //         factory: new CreateUserFactory(),
+    //         factory: new UserFactory(),
     //         dto: new CreateUserDTO(),
     //         model: User_model
     //     }),
     //     // officeDriver: new OfficeDriver({
-    //     //     factory: new CreateUserFactory(),
+    //     //     factory: new UserFactory(),
     //     //     dto: new CreateUserDTO(),
     //     //     model: User_model
     //     // }),
     //     // paymentDriver: new PaymentDriver({
-    //     //     factory: new CreateUserFactory(),
+    //     //     factory: new UserFactory(),
     //     //     dto: new CreateUserDTO(),
     //     //     model: User_model
     //     // })
@@ -77,19 +73,30 @@ class Core implements ICore{
     // }
 
     private constructor() {
-        emiter.on('getOneUser',  (req: Request, res: Response) =>
+        emiter.on('TakeOneUserByIdEvent',  (req: Request, res: Response) =>
             this.getOneEntity(req, res, this.userDrive));
-        emiter.on('letGetManyUsers',(req: Request, res: Response) =>
-            this.getManyEntity(req, res, this.userDrive));
-        emiter.on('createNewUserEvent', (req: Request, res: Response) =>
+        emiter.on('TakeOneUserByTelegramIdEvent',  (req: Request, res: Response) =>
+            this.getOneByTelegramId(req, res, this.userDrive));
+        emiter.on('TakeManyUsersEvent',(req: Request, res: Response) =>
+            this.takeManyEntity(req, res, this.userDrive));
+        emiter.on('CreateOneUserEvent', (req: Request, res: Response) =>
             this.createNewEntity(req, res, this.userDrive));
-        emiter.on('updateCurrentUserEvent', (req: Request, res: Response) =>
+        emiter.on('UpdateOneUserEvent', (req: Request, res: Response) =>
             this.updateCurrentEntity(req, res, this.userDrive));
-        emiter.on('deleteCurrentUserEvent', (req: Request, res: Response) =>
+        emiter.on('DeleteOneUserEvent', (req: Request, res: Response) =>
             this.deleteCurrentEntity( req, res, this.userDrive));
 
-        emiter.on('takemanyproducts', (req: Request, res: Response)=>
-            this.getManyEntity(req, res, this.productDriver));
+
+        emiter.on('letTakeOneProductEvent', (req: Request, res: Response)=>
+            this.getOneEntity(req, res, this.productDriver));
+        emiter.on('letTakeManyProductEvent', (req: Request, res: Response)=>
+            this.takeManyEntity(req, res, this.productDriver));
+        emiter.on('letCreateProductEvent', (req: Request, res: Response)=>
+            this.createNewEntity(req, res, this.productDriver));
+        emiter.on('letUpdateProductEvent', (req: Request, res: Response)=>
+            this.updateCurrentEntity(req, res, this.productDriver));
+        emiter.on('letDeleteProductEvent', (req: Request, res: Response)=>
+            this.deleteCurrentEntity(req, res, this.productDriver));
     }
 
     public static getInstance(): Core {
@@ -100,20 +107,32 @@ class Core implements ICore{
     }
 
 
+    public getOneByTelegramId = async (
+        req: Request,
+        res: Response,
+        driver: IUserDriver
+    ): Promise<void>=> {
 
-
-    public getOneEntity = async (req: Request, res: Response, driver: any)=> {
-
-        await driver.getOne(req, res)
+        await driver.takeByTelegramId(req, res)
 
     }
 
-    public getManyEntity = async (
+    public getOneEntity = async (
+        req: Request,
+        res: Response,
+        driver: IUserDriver | IOfficeDriver | IPaymentDriver | ISessionDriver
+    ): Promise<void>=> {
+
+        await driver.takeOne(req, res)
+
+    }
+
+    public takeManyEntity = async (
         req: Request,
         res: Response,
         driver: IUserDriver | IOfficeDriver | IPaymentDriver | ISessionDriver
     ): Promise<void> => {
-        await driver.getMany(req, res)
+        await driver.takeMany(req, res)
     }
 
     public createNewEntity = async (
@@ -128,7 +147,7 @@ class Core implements ICore{
         req: Request,
         res: Response,
         driver: IUserDriver | IOfficeDriver | IPaymentDriver | ISessionDriver
-    ) :Promise<void> => {
+    ):Promise<void> => {
         await driver.update(req, res)
     }
 
@@ -136,8 +155,8 @@ class Core implements ICore{
         req: Request,
         res: Response,
         driver: IUserDriver | IOfficeDriver | IPaymentDriver | ISessionDriver
-    )=> {
-
+    ):Promise<void> => {
+        await driver.delete(req, res)
     }
 
     public consumePayment = async () => {

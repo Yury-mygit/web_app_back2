@@ -21,6 +21,7 @@ export const core: ICore = Core.getInstance()
 
 
 import routes from './index_routes';
+import testRoutes from './selftest/st_router'
 
 
 applyMiddlewares(app);
@@ -36,9 +37,10 @@ app.get('/home', (req, res) => {
 });
 
 app.use('/', routes);
+app.use('/test', testRoutes)
 
 import { DebugController } from './debugger/debugger';
-import { st } from "./subject/user/UserRouter";
+import { st } from "./core/routers/UserRouter";
 
 const debugController = new DebugController(st); // Pass 'st' to the constructor
 app.get('/debug/store', debugController.getDebugView);

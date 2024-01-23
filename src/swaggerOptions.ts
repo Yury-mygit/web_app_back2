@@ -25,13 +25,14 @@ const swaggerOptions = {
         './src/app.ts',
         './src/routers/index_routes.ts',
         './src/mok/fake_router.ts',
-        './src/subject/user/UserRouter.ts',
-        './src/subject/office/office_router.ts',
-        './src/subject/product/product_router.ts',
-        './src/subject/session/session_router.ts',
-        './src/subject/payments/payment_router.ts',
-        './src/subject/staff/employee_router.ts',
-        './src/tilda/tilda_router.ts'
+        './src/core/routers/UserRouter.ts',
+        './src/core/routers/office_router.ts',
+        './src/core/routers/product_router.ts',
+        './src/core/routers/session_router.ts',
+        './src/core/routers/payment_router.ts',
+        './src/core/routers/employee_router.ts',
+        './src/tilda/tilda_router.ts',
+        './src/selftest/st_router.ts'
     ],
 };
 

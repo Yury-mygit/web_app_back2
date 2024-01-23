@@ -1,9 +1,9 @@
 import {faker} from "@faker-js/faker";
 import IDataGenerationStrategy from "./IDataGenerationStrategy";
-import {UserCreationAttributes, UserStatus} from "../../../subject/user/user_interface";
+import UserAttributes, { UserStatus} from "../../../core/interfas/userAtributes";
 
 class FakerUserDataGenerationStrategy implements IDataGenerationStrategy {
-    generateUserData(telegramId: number): UserCreationAttributes {
+    generateUserData(telegramId: number): Partial<UserAttributes> {
 
         const initial_diagnosis_date = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000)
         return {

@@ -1,6 +1,6 @@
 import { body, validationResult } from 'express-validator';
-import {PaymentStatus, ProductType} from "./payment_model";
-import ProductModel from "../product/product_model";
+import {PaymentStatus, ProductType} from "../../core/models/payment_model";
+import ProductModel from "../../core/models/product_model";
 class Validator {
 
     static messegeBylder = (s:string) => {

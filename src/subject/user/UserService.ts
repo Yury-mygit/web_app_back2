@@ -1,4 +1,4 @@
-import User_model from "./user_model";
+import User_model from "../../core/models/user_model";
 import { CreateUserDTO, UpdateUserDTO } from "./UserDTO";
 import UserAttributes from "./user_interface";
 import {IUserService} from "./UserController";

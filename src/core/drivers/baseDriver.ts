@@ -3,24 +3,22 @@ import answerFilter from "../filter/UserAnswerFilter";
 import {Response, Request} from "express";
 import Core from "../core";
 import {da} from "@faker-js/faker";
-import User_model from "../../subject/user/user_model";
+import User_model from "../models/user_model";
 
 export interface IBaseEntity {
     configureStore(store_: IStore) :void
-    // validate(): void
     sayHello():void
-    // configureStore
     save({ model, data }: { model: any, data: any }): Promise<any>;
     update(req: Request, res: Response): Promise<void>;
     answer(data: any, filter: string[]): any
     sendOkAnswer (data: any, res: Response):any
     sendErrorAnswer(data: any, res: Response):any
-    getOne (req: Request, res: Response):Promise<void>
-    getMany(req: Request, res: Response):Promise<void>
-    // validate(data: any):any
+    baseGetOne (req: Request, res: Response):Promise<void>
+    // baseTakeMany(req: Request, res: Response):Promise<void>
     buildDataPackToDB(data: any):any
     answerBuild(data: any) :any;
-    create(req: Request, res: Response) : Promise<void>
+    BaseCreate(req: Request, res: Response) : Promise<void>
+    baseDelete(req:Request, res: Response): Promise<void>
     dto:any
     factory:any
     model:any
@@ -38,7 +36,6 @@ abstract class BaseDriver implements IBaseEntity{
 
     public constructor(dto: any = undefined) {
          this.dto = dto
-        // console.log( this.dto)
     }
 
     public configureStore(store_: IStore): void {
@@ -80,11 +77,11 @@ abstract class BaseDriver implements IBaseEntity{
     };
 
 
-    public getOne = async (req: Request, res: Response):Promise<void> => {
-
+    public baseGetOne = async (req: Request, res: Response):Promise<void> => {
+        res.status(200).json('Placeholder Base Take One ')
     }
 
-    public getMany= async (req: Request, res: Response):Promise<void> => {
+    public baseTakeMany= async (req: Request, res: Response):Promise<void> => {
 
         let { limit, skip } = req.body;
 
@@ -92,16 +89,16 @@ abstract class BaseDriver implements IBaseEntity{
 
             const primaryKey = this.model.primaryKeyAttribute;
 
-            const ansver = await this.model.findAll({
+            const answer = await this.model.findAll({
                 offset: skip,
                 limit: limit,
                 order: [primaryKey], // Corrected order syntax
                 attributes:this.attributes
             });
-            // console.log(ansver)
+            // console.log(answer)
             this.sendOkAnswer({
                 status: 'ok',
-                data: ansver
+                data: answer
             }, res)
         } catch (error: any) {
             this.sendErrorAnswer( {
@@ -114,14 +111,12 @@ abstract class BaseDriver implements IBaseEntity{
 
 
     public save = async ({model, data} : {model: any, data:any}) => {
-
-        // console.log(data)
         try {
             const answer:any = await model.create(data);
             return answer.dataValues
 
         } catch (error: any) {
-            throw new Error('Error')
+            throw new Error('Error :' + error)
         }
     }
 
@@ -140,6 +135,27 @@ abstract class BaseDriver implements IBaseEntity{
         // }
     }
 
+    public baseDelete = async (req: Request, res: Response) => {
+        const id = req.params.id; // or req.body.id if the ID is sent in the body
+
+        try {
+            // Obtain the primary key column name dynamically from the model
+            const primaryKeyColumnName = this.model.primaryKeyAttribute;
+
+            const result = await this.model.destroy({
+                where: { [primaryKeyColumnName]: id }
+            });
+
+            if (result > 0) {
+                res.status(200).json({ message: 'Entry deleted successfully' });
+            } else {
+                res.status(404).json({ message: 'Entry not found' });
+            }
+        } catch (error) {
+            console.error(error);
+            res.status(500).json({ message: 'Error deleting entry' });
+        }
+    }
 
     public answerBuild =  (data:any) =>{
          return this.answerFilter.build(data)
@@ -170,7 +186,7 @@ abstract class BaseDriver implements IBaseEntity{
         res.status(400).json(data)
     }
 
-    public create = async (req: Request, res: Response) : Promise<void> => {}
+    public BaseCreate = async (req: Request, res: Response) : Promise<void> => {}
 
 }
 

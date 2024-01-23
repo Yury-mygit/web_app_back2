@@ -1,6 +1,6 @@
 import { Table, Column, Model, DataType, CreatedAt, UpdatedAt, AutoIncrement, PrimaryKey, AllowNull, Unique, Default } from 'sequelize-typescript';
 import {sequelize} from "../../database/database";
-import User_model from "../user/user_model";
+import User_model from "./user_model";
 
 export interface OfficeAttributes {
     office_id:number;

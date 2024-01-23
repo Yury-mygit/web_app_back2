@@ -1,6 +1,6 @@
 import express from 'express';
-import controller from './Payment_Contriller'
-import Validator from './Validator'
+import controller from '../../subject/payments/Payment_Contriller'
+import Validator from '../../subject/payments/Validator'
 
 export const paymentsRouter = express.Router();
 
@@ -16,7 +16,7 @@ paymentsRouter.post('/consume', ...Validator.validateConsumePay(), async (req, r
         next(error);
     }
 });
-paymentsRouter.patch('/test', controller.test)
+// paymentsRouter.patch('/test', controller.test)
 paymentsRouter.delete("/delete",...Validator.validateDelete(), controller.deletePayment);
 
 

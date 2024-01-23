@@ -1,5 +1,5 @@
 import express from 'express';
-import studentsRouter from "../subject/user/UserRouter";
+import studentsRouter from "../core/routers/UserRouter";
 
 const router = express.Router();
 

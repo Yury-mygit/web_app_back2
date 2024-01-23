@@ -1,6 +1,5 @@
 import { IsDefined,  IsOptional, IsNumber, IsString, IsBoolean, ValidateNested ,IsDate} from 'class-validator';
-import {UserStatus} from "../../subject/user/user_interface";
-import UserAttributes from "../../subject/user/user_interface";
+import UserAttributes, {UserStatus} from "../../core/interfas/userAtributes";
 
 class UserResponse{
     // @IsNumber()

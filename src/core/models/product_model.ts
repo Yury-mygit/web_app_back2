@@ -10,7 +10,7 @@ import {
     HasOne
 } from 'sequelize-typescript';
 import {sequelize} from "../../database/database";
-import PaymentModel from "../payments/payment_model";
+import PaymentModel from "./payment_model";
 
 export enum ProductType {
     subscription = 'subscription',

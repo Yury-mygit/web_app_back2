@@ -2,21 +2,21 @@
 Controller that fill db with fake data. Pay attention! Db will drop and fill with new fake data
 */
 import {Model, Op} from 'sequelize'; // Make sure to import Model from sequelize
-import User_model from "../subject/user/user_model";
-import UserAttributes, {UserCreationAttributes, UserStatus} from "../subject/user/user_interface"
-import SessionAttributes, {PartialSessionAttributes} from "../interface/session_interfases";
+import User_model from "../core/models/user_model";
+import UserAttributes, {UserStatus} from "../core/interfas/userAtributes"
+import SessionAttributes, {PartialSessionAttributes} from "../core/interfas/session_interfases";
 
-import Session_model, {ServiceType, Status} from "../subject/session/session_model";
-import Office_model, {OfficeAttributes} from "../subject/office/office_model";
-import Employee_model, {StaffAttributes} from "../subject/staff/employee_model";
-import Payment_model from "../subject/payments/payment_model";
-import payment_model, {PayCreationAttributes, PaymentStatus} from "../subject/payments/payment_model";
+import Session_model, {ServiceType, Status} from "../core/models/session_model";
+import Office_model, {OfficeAttributes} from "../core/models/office_model";
+import Employee_model, {StaffAttributes} from "../core/models/employee_model";
+import Payment_model from "../core/models/payment_model";
+import payment_model, {PayCreationAttributes, PaymentStatus} from "../core/models/payment_model";
 
 import {faker} from "@faker-js/faker";
 
 import PayHandler from '../database/handlers/PaymentDataHandler'
 import {NextFunction, Request, Response} from "express";
-import Product_model, {ProductAttributes, ProductType} from "../subject/product/product_model";
+import Product_model, {ProductAttributes, ProductType} from "../core/models/product_model";
 
 
 
@@ -379,7 +379,7 @@ class FakeDataController {
         let uniqueIndex = 0;
         const uniqueTimes = new Set();
 
-        users_local.forEach((stud_loc) => {
+        users_local.forEach((stud_loc:Partial<UserAttributes>) => {
             const session_number: number = this.getRandomElement([1, 2, 3]) || 1;
 
             for (let i = 0; i < session_number; i++) {

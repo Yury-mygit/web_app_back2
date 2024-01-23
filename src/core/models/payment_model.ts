@@ -9,10 +9,10 @@ import {
     ForeignKey,
     BelongsTo
 } from 'sequelize-typescript';
-import { User_model } from '../user/user_model';
+import { User_model } from './user_model';
 import { Optional } from 'sequelize';
 import {sequelize} from "../../database/database";
-import ProductModel from "../product/product_model";
+import ProductModel from "./product_model";
 
 export enum PaymentStatus {
     NEW = "new",

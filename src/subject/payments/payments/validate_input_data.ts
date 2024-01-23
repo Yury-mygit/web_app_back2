@@ -1,5 +1,5 @@
 import { Response } from 'express';
-import User_model from "../../user/user_model";
+import User_model from "../../../core/models/user_model";
 
 const req_validate_and_configure_input_data = async (user_id: number | undefined, telegram_id: number | undefined, product_id: number) => {
 

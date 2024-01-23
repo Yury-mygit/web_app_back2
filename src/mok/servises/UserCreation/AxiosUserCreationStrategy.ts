@@ -1,5 +1,5 @@
 import axios from "axios";
-import UserAttributes from "../../../subject/user/user_interface";
+import UserAttributes from "../../../core/interfas/userAtributes";
 
 
 export interface IUserCreationStrategy {

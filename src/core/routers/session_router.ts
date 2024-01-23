@@ -1,14 +1,32 @@
-import express from 'express';
-import sessionController from "./session_controller"
+import express,{Request, Response} from 'express';
+// import sessionController from "../../subject/session/session_controller"
 
 const router = express.Router();
+import {emiter} from "../core";
 
-router.get('/', sessionController.getAllSessions);
-router.patch('/',sessionController.updateSession)
-router.post('/', sessionController.createSession)
-router.delete('/', sessionController.deleteSession)
+router.post('/tale/one/by_id', (req: Request, res: Response):void=>{
+    emiter.emit("TakeOneSessionByIdEvent")
+});
 
-router.post("/fulfill", sessionController.fulfill)
+router.post('/take/many', (req: Request, res: Response):void=> {
+    emiter.emit('TakeManySessionsEvent', req, res);
+});
+
+
+router.post('/create/one', (req: Request, res: Response)=> {
+
+    emiter.emit('CreateOneSessionEvent', req, res);
+})
+
+router.patch('/update/one', (req: Request, res: Response)=>{
+    emiter.emit('UpdateOneSessionEvent', req, res)
+})
+
+router.delete('/delete/one',(req: Request, res: Response)=>{
+    emiter.emit('DeleteOneSessionEvent', req, res)
+})
+
+// router.post("/fulfill", sessionController.fulfill)
 
 export default router;
 
